@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<robot
+  xmlns:xacro="http://www.ros.org/wiki/xacro"
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+
+  <!--
+     Modified helper macros, which return a default inertia matrix
+     useable in Gazebo. Note that Gazebo cannot handle the realistic
+     values returned by the original macros, and the whole robot
+     osciallates very badly in simulation.
+
+     03.08.2012 - new version, fnh
+     -->
+  <xacro:macro name="cuboid_inertia_def" params="width height length mass">
+    <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1" />
+  </xacro:macro>
+
+  <!-- length is along the y-axis! -->
+  <xacro:macro name="cylinder_inertia_def" params="radius length mass">
+    <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1" />
+  </xacro:macro>
+
+</robot>

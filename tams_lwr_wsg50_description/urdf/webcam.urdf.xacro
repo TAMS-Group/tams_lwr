@@ -1,0 +1,109 @@
+<robot
+   xmlns:xacro="http://www.ros.org/wiki/xacro"
+   name="webcam">
+
+<xacro:macro name="webcam" params="parent name *origin">
+  <joint name="webcam_${name}_joint" type="fixed">
+    <xacro:insert_block name="origin" />
+    <parent link="${parent}"/>
+    <child link="webcam_${name}_link" />
+  </joint>
+
+  <link name="webcam_${name}_link">
+    <inertial>
+      <mass value="0.01" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1" />
+    </inertial>
+    <visual>
+      <material name="Blue" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.05 0.05 0.05" />
+	      <!-- <mesh filename="package://tams_description/meshes/kinect.dae"/> -->
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.05 0.05 0.05" />
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="webcam_${name}_link">
+    <turnGravityOff>false</turnGravityOff>
+    <selfCollide>true</selfCollide>
+    <material>Gazebo/Grey</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <link name="webcam_${name}_lens_link">
+    <inertial>
+      <mass value="0.01" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1" />
+    </inertial>
+    <visual>
+      <material name="Black" />
+      <origin xyz="0 0 0.005" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.01" length="0.01" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.005" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.01" length="0.01" />
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="webcam_${name}_lens_link">
+    <turnGravityOff>false</turnGravityOff>
+    <selfCollide>true</selfCollide>
+    <material>Gazebo/Grey</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <joint name="webcam_${name}_lens_joint" type="fixed">
+    <origin xyz="0.025 0 0" rpy="0 1.57 0" />
+    <parent link="webcam_${name}_link"/>
+    <child link="webcam_${name}_lens_link"/>
+  </joint>
+
+  <gazebo reference="webcam_${name}_link">
+    <sensor:camera name="webcam_${name}_sensor">
+      <imageSize>640 480</imageSize>
+      <imageFormat>R8G8B8</imageFormat>
+      <hfov>90</hfov>
+      <nearClip>0.1</nearClip>
+      <farClip>10</farClip>
+      <updateRate>2</updateRate>
+
+      <controller:gazebo_ros_prosilica name="webcam_${name}_controller" plugin="libgazebo_ros_prosilica.so">
+      <!--<controller:gazebo_ros_camera  name="LeftCamera_controller" plugin="libgazebo_ros_camera.so"> -->
+        <alwaysOn>true</alwaysOn>
+        <updateRate>2</updateRate>
+        <imageTopicName>/webcam_${name}/image_raw</imageTopicName>
+        <cameraInfoTopicName>/webcam/camera_info</cameraInfoTopicName>
+        <cameraName>webcam_${name}</cameraName>
+        <frameName>webcam_${name}_link</frameName>
+        <distortion_k1>0.0</distortion_k1>
+        <distortion_k2>0.0</distortion_k2>
+        <distortion_k3>0.0</distortion_k3>
+        <distortion_t1>0.0</distortion_t1>
+        <distortion_t2>0.0</distortion_t2>
+      <!-- </controller:gazebo_ros_camera> -->
+      </controller:gazebo_ros_prosilica>
+    </sensor:camera>
+  </gazebo>
+</xacro:macro>
+
+</robot>

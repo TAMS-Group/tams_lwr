@@ -1,0 +1,156 @@
+<?xml version="1.0" ?>
+<robot
+       xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="SCITOS_G5_camerahead">
+
+  <!-- Simplified Xacro/Gazebo model of the Playstation Eye camera,
+       for ROS Hydro an up.
+
+       2016.06.12 - created, based on Robot-Era Doro model
+
+       (C) 2013, 2014, 2016 fnh, hendrich@informatik.uni-hamburg.de
+   -->
+
+
+<xacro:macro name="pseye" params="name parent namespace link_prefix *origin">
+
+  <!-- simplified camera housing / body -->
+  <link name="${link_prefix}${name}_camera_link">
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      <origin/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.02 0.1 0.05" />
+      </geometry>
+      <material name="black" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.02 0.1 0.05" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="${link_prefix}${name}_camera_link">
+    <material>Gazebo/Black</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+    <selfCollide>true</selfCollide>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+  <joint name="${link_prefix}${name}_mount_joint" type="fixed">
+    <parent link="${parent}"/>
+    <child link="${link_prefix}${name}_camera_link" />
+    <xacro:insert_block name="origin" />
+  </joint>
+
+  <!-- a cylinder as the simplified camera lens body -->
+  <link name="${link_prefix}${name}_lens_link">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      <origin/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.01" length="0.02" />
+      </geometry>
+      <material name="black" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.001" length="0.001" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="${link_prefix}${name}_lens_link">
+    <turnGravityOff>false</turnGravityOff>
+    <selfCollide>true</selfCollide>
+    <material>Gazebo/Black</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <joint name="${link_prefix}${name}_lens_joint" type="fixed">
+    <parent link="${link_prefix}${name}_camera_link" />
+    <child link="${link_prefix}${name}_lens_link" />
+    <origin xyz="0.02 0 0" rpy="0 1.571 0" />
+  </joint>
+
+  <!--Hannes: This joint is necessary as the simulated camera has no offset to the camera base-->
+  <link name="${link_prefix}${name}_lens_sim_link">
+  </link>
+  <joint name="${link_prefix}${name}_simulated_lens_joint" type="fixed">
+    <parent link="${link_prefix}${name}_camera_link"/>
+    <child link="${link_prefix}${name}_lens_sim_link" />
+    <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+  </joint>
+
+  <!-- the actual camera sensor for Gazebo, 31BF03 -->
+  <!-- Note: not sure whether to set sensor->update_rate or plugin->update_rate or both... -->
+  <gazebo reference="${link_prefix}${name}_camera_link">
+   <sensor type="camera" name="${link_prefix}${name}_camera_sensor">
+      <update_rate>30.0</update_rate>
+      <camera name="${name}_camera_sensor">
+        <horizontal_fov>0.61</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>10</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="${name}_camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>30.0</updateRate>
+        <robotNamespace>${namespace}</robotNamespace>
+        <cameraName>${name}_camera</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <!--Hannes: Changes: Publish the simulation-only link LeftCameraLens_Sim, exclude all calibration parameters as they are not simulated and therefore will only disturb object detection algorithms-->
+        <frameName>${link_prefix}${name}_lens_sim_link</frameName>
+        <!--
+        <CxPrime>533.4</CxPrime>
+        <Cx>533.4</Cx>
+        <Cy>393.1</Cy>
+        <focal_length>1633</focal_length>
+        <distortion_k1>-0.3522</distortion_k1>
+        <distortion_k2>0.1474</distortion_k2>
+        <distortion_k3>0.00115</distortion_k3>
+        <distortion_t1>0.00185</distortion_t1>
+        <distortion_t2>0.0</distortion_t2>
+        -->
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!--
+  <joint name="{link_prefix}${name}_camera_joint" type="fixed" >
+    <parent link="${link_prefix}${name}_camera_link" />
+    <child link="${link_prefix}${name}_camera_link" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+  -->
+</xacro:macro>
+
+</robot>

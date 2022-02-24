@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<robot name="experiment_table" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+       The experiment tables in lab room F329 are 140x70 cm2 and height 72cm,
+       normal tables are 160x80 and height 72cm. Leg diameter is 3cm.
+       The table has styrofoam inset of size 100x50
+  -->
+
+  <xacro:include filename="$(find tams_description)/objects/uham_setup/table.xacro" />
+
+  <xacro:property name="table_height" value="0.72" />
+  <xacro:property name="table_width" value="1.40" />
+  <xacro:property name="table_depth" value="0.70" />
+  <xacro:property name="leg_radius" value="0.015" />
+  <xacro:property name="table_x" value="0.0" />
+  <xacro:property name="table_y" value="0.0" />
+  <xacro:property name="table_z" value="0.0" />
+  <xacro:property name="table_top_thickness" value="0.02"/>
+
+  <link name="styrofoam_plate">
+    <inertial>
+      <mass value="0.02" />
+      <origin xyz="0 0 ${table_height - table_top_thickness/2}" />
+      <inertia ixx="1" ixy="0"  ixz="0" iyy="1" iyz="0" izz="1" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${table_height - table_top_thickness/2}" />
+      <geometry>
+        <box size="1.0 0.5 0.024" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${table_height - table_top_thickness/2}" />
+      <geometry>
+        <box size="1.0 0.5 0.024" />
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="styrofoam_plate">
+    <material>handle/DecimeterGrid</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <joint name="$styrofoam_fix" type="fixed" >
+    <parent link="table_plate" />
+    <child link="styrofoam_plate" />
+    <origin xyz="0 -0.105 0" rpy="0 0 0" />
+  </joint>
+
+</robot>

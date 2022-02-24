@@ -1,0 +1,20 @@
+controller_list:
+  - name: lwr
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: True
+    joints:
+      - lwr_arm_0_joint
+      - lwr_arm_1_joint
+      - lwr_arm_2_joint
+      - lwr_arm_3_joint
+      - lwr_arm_4_joint
+      - lwr_arm_5_joint
+      - lwr_arm_6_joint
+  - name: wsg_50_gripper_action_server
+    action_ns: gripper_action
+    type: GripperCommand
+    default: True
+    joints:
+      - wsg_50_gripper_base_joint_gripper_left
+      - wsg_50_gripper_base_joint_gripper_right

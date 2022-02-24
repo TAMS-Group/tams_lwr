@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<robot name="ik_marker" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- a small box to be used as a (visual) marker for the IK and
+       collision-avoidance target.
+  -->
+
+  <xacro:macro name="ik_marker" params="marker_name marker_color">
+    <link name="${marker_name}">
+      <inertial>
+        <mass value="0.001" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.0001" ixy="0"  ixz="0" iyy="0.0001" iyz="0" izz="0.0001" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" />
+        <geometry>
+          <box size="0.01 0.01 0.01" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" />
+        <geometry>
+          <box size="0 0 0" />
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${marker_name}">
+      <material>${marker_color}</material>
+      <mu1>50.0</mu1>
+      <mu2>50.0</mu2>
+      <kp>1000.0</kp>
+      <kd>1000.0</kd>
+      <selfCollide>false</selfCollide>
+      <!-- <turnGravityOff>true</turnGravityOff> -->
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>

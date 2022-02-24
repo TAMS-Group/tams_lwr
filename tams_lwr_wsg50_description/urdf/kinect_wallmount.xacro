@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<robot
+       xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="wallmounted_kinect">
+
+  <!-- <xacro:include filename="$(find sr_description)/materials.urdf.xacro" /> -->
+  <xacro:include filename="$(find tams_lwr_wsg50_description)/urdf/kinect.xacro" />
+  <link name="world" />
+
+  <!-- SR kinect, xyz rpy set in the macro itself -->
+  <xacro:wallmount_kinect parent="world">
+  </xacro:wallmount_kinect>
+
+</robot>

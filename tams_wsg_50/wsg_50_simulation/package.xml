@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package>
+  <name>wsg_50_simulation</name>
+  <version>0.0.0</version>
+  <description>
+    ROS robot model, meshes, and teleop utilities for the Schunk
+    WSG-50 gripper.
+  </description>
+
+  <maintainer email="hendrich@informatik.uni-hamburg.de">Norman Hendrich</maintainer>
+  <license>BSD</license>
+  <author email="hendrich@informatik.uni-hamburg.de">Norman Hendrich</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>wsg_50_common</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>urdf</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>wsg_50_common</run_depend>
+
+  <export>
+  </export>
+</package>

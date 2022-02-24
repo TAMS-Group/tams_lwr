@@ -1,0 +1,148 @@
+# PID JointPositionController parameters for the simulated
+# KuKA LWR robot arm.
+#
+# 06.08.12 - add lwr_joint_trajectory_action_controller
+# 02.08.12 - new file
+#
+# Note: due to the high payload (Shadow hand) we need pretty large
+# p parameters to avoid excessive joint-angle errors. For example,
+# p=1000 for pa10_s2 results in up to 5 degrees error for joint 2.
+#
+# Note: the parameters for the cartesian and trajectory controllers
+# are not yet tested nor tuned.
+#
+# (C) 2012 fnh, hendrich@informatik.uni-hamburg.de
+#
+lwr_arm_0_joint_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: lwr_arm_0_joint
+  pid:
+    p: 50000.0
+    i: 20.0
+    d: 1.0
+    i_clamp: 2.0
+    deadband: 0.001
+
+lwr_arm_1_joint_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: lwr_arm_1_joint
+  pid:
+    p: 40000.0
+    i: 20.0
+    d: 1.0
+    i_clamp: 200.0
+    deadband: 0.001
+
+lwr_arm_2_joint_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: lwr_arm_2_joint
+  pid:
+    p: 50000.0
+    i: 20.0
+    d: 1.0
+    i_clamp: 2.0
+    deadband: 0.001
+
+lwr_arm_3_joint_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: lwr_arm_3_joint
+  pid:
+    p: 50000.0
+    i: 20.0
+    d: 1.0
+    i_clamp: 2.0
+    deadband: 0.001
+
+lwr_arm_4_joint_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: lwr_arm_4_joint
+  pid:
+    p: 50000.0
+    i: 20.0
+    d: 1.0
+    i_clamp: 2.0
+
+lwr_arm_5_joint_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: lwr_arm_5_joint
+  pid:
+    p: 50000.0
+    i: 20.0
+    d: 1.0
+    i_clamp: 2.0
+
+lwr_arm_6_joint_controller:
+  type: robot_mechanism_controllers/JointPositionController
+  joint: lwr_arm_6_joint
+  pid:
+    p: 50000.0
+    i: 20.0
+    d: 1.0
+    i_clamp: 2.0
+
+lwr_cartesian_pose_controller:
+  type: robot_mechanism_controllers/CartesianPoseController
+  root_name: lwr_arm
+  tip_name: lwr_arm_7_link
+  fb_trans:
+    p: 20.0
+    i: 0.5
+    d: 0.0
+    i_clamp: 1.0
+  fb_rot:
+    p: 0.5
+    i: 0.1
+    d: 0.0
+    i_clamp: 0.2
+
+
+lwr_joint_trajectory_controller:
+  type: robot_mechanism_controllers/JointSplineTrajectoryController
+  joints:
+    - lwr_arm_0_joint
+    - lwr_arm_1_joint
+    - lwr_arm_2_joint
+    - lwr_arm_3_joint
+    - lwr_arm_4_joint
+    - lwr_arm_5_joint
+    - lwr_arm_6_joint
+  gains:
+    lwr_arm_0_joint: {p: 10000.0, d: 30.0}
+    lwr_arm_1_joint: {p: 10000.0, d: 30.0}
+    lwr_arm_2_joint: {p: 10000.0, d: 30.0}
+    lwr_arm_3_joint: {p: 10000.0, d: 30.0}
+    lwr_arm_4_joint: {p: 10000.0, d: 30.0}
+    lwr_arm_5_joint: {p: 10000.0, d: 30.0}
+    lwr_arm_6_joint: {p: 10000.0, d: 30.0}
+
+
+
+lwr_joint_trajectory_action_controller:
+  type: "robot_mechanism_controllers/JointTrajectoryActionController"
+  joints:
+    - lwr_arm_0_joint
+    - lwr_arm_1_joint
+    - lwr_arm_2_joint
+    - lwr_arm_3_joint
+    - lwr_arm_4_joint
+    - lwr_arm_5_joint
+    - lwr_arm_6_joint
+  gains:
+    lwr_arm_0_joint: {p: 50000.0, d: 30.0, i: 20.0, i_clamp: 4.0}
+    lwr_arm_1_joint: {p: 50000.0, d: 30.0, i: 20.0, i_clamp: 4.0}
+    lwr_arm_2_joint: {p: 50000.0, d: 30.0, i: 20.0, i_clamp: 4.0}
+    lwr_arm_3_joint: {p: 50000.0, d: 30.0, i: 20.0, i_clamp: 4.0}
+    lwr_arm_4_joint: {p: 50000.0, d: 30.0, i: 20.0, i_clamp: 4.0}
+    lwr_arm_5_joint: {p: 50000.0, d: 30.0, i: 20.0, i_clamp: 4.0}
+    lwr_arm_6_joint: {p: 50000.0, d: 30.0, i: 20.0, i_clamp: 4.0}
+  joint_trajectory_action_node:
+    joints:
+      - lwr_arm_0_joint
+      - lwr_arm_1_joint
+      - lwr_arm_2_joint
+      - lwr_arm_3_joint
+      - lwr_arm_4_joint
+      - lwr_arm_5_joint
+      - lwr_arm_6_joint
+    constraints:
+      goal_time: 0.6

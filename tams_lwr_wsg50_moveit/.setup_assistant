@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: tams_lwr_wsg50_description
+    relative_path: urdf/lwr_with_wsg50.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/lwr_with_wsg50.srdf
+  CONFIG:
+    author_name: Hongzhuo Liang
+    author_email: liang@informatik.uni-hamburg.de
+    generated_timestamp: 1645624197

@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="launch_upload" default="true" />
+  <arg name="launch_joint_state_merger" default="true" />
+  <arg name="launch_lwr" default="false" />    <!-- Kuka LWR with FRI -->
+  <arg name="launch_wsg" default="true" />    <!-- Schunk WSG-50 gripper via TCP -->
+  <arg name="launch_moveit" default="true" />
+  <arg name="launch_rviz" default="true" />
+  <arg name="launch_mechmind" default="true" />
+  <arg name="pipeline" default="ompl" />
+
+
+  <!-- Uploads the robot_description (lwr + wsg50 + table) to the param server. -->
+  <group if="$(arg launch_upload)">
+    <include file="$(find tams_lwr)/launch/lwr_wsg50_upload.launch" />
+  </group>
+
+
+  <!-- LWR arm controller node and robot_state_publisher -->
+  <group if="$(arg launch_lwr)">
+    <include file="$(find tams_lwr)/launch/ros_fri.launch" />
+  </group>
+
+
+  <!-- Schunk WSG-50 controller node and robot_state_publisher -->
+  <group if="$(arg launch_wsg)">
+    <include file="$(find tams_lwr)/launch/wsg50.launch" />
+  </group>
+
+
+  <!-- joint_state merger -->
+  <group if="$(arg launch_joint_state_merger)">
+    <node pkg="tams_lwr" type="joint_state_merger" name="joint_state_merger" output="log">
+    </node>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="100.0" />
+      <param name="tf_prefix" type="string" value="" />
+    </node>
+  </group>
+
+  <!-- moveit -->
+  <group if="$(arg launch_moveit)">
+    <include file="$(find tams_lwr)/launch/move_group.launch" >
+      <arg name="pipeline" value="$(arg pipeline)" />
+    </include>
+  </group>
+
+  <!-- rviz -->
+  <group if="$(arg launch_rviz)">
+    <include file="$(find tams_lwr)/launch/rviz.launch" >
+    </include>
+  </group>
+
+  <!-- mechmind camera -->
+  <group if="$(arg launch_mechmind)">
+    <include file="$(find tams_lwr)/launch/mechmind.launch"/>
+  </group>
+</launch>

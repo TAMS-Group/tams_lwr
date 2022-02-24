@@ -1,0 +1,16 @@
+# interfaces(5) file used by ifup(8) and ifdown(8)
+auto lo
+iface lo inet loopback
+#
+auto eth0
+iface eth0 inet dhcp
+  dns-nameservers 134.100.9.61 134.100.33.240
+  dns-search informatik.uni-hamburg.de uni-hamburg.de informatik.uni-hamburg.de.local
+
+up route add -net 10.68.0.0/24 gw 134.100.13.224 dev eth0
+# This port is for using KUKA lwr
+auto eth1
+iface eth1 inet static
+  address 192.168.0.2
+    netmask 255.255.255.0
+

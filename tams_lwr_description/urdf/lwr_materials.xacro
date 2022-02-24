@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<robot>
+  <material name="LwrDarkGrey">
+    <color rgba="0.3 0.3 0.3 1.0"/>
+  </material>
+
+  <material name="LwrRed">
+    <color rgba="0.3 0.3 0.3 1.0"/>
+  </material>
+
+  <material name="LwrBlack">
+    <color rgba="0 0 0 1.0"/>
+  </material>
+
+  <material name="LwrOrange">
+    <color rgba="1.0 0.487 0 1.0"/>
+  </material>
+
+  <material name="LwrSilver">
+    <color rgba="0.9 0.9 0.8 1.0"/>
+  </material>
+
+  <material name="LwrSickBlue">
+    <color rgba="0.3058 0.5921 0.7294 1.0"/>
+  </material>
+
+</robot>

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!--
+  - Uploads the robot_description (lwr + wsg50 + table) to the param server.
+
+  2017.02.14 - upload semantic description
+  2016.06.29 - fnh: updated for Hydro+catkin
+  -->
+
+
+  <!-- LWR arm with WSG-50 gripper, tables: send urdf to param server -->
+  <param name="robot_description"
+         command="$(find xacro)/xacro $(find tams_lwr_wsg50_description)/urdf/lwr_with_wsg50.xacro" />
+
+  <!-- The semantic description that corresponds to the URDF -->
+  <param name="robot_description_semantic" textfile="$(find tams_lwr_wsg50_moveit)/config/lwr_with_wsg50.srdf" />
+
+</launch>

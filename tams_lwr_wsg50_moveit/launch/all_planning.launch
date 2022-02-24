@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+
+  <param name="robot_description"
+         command="$(find xacro)/xacro $(find tams_lwr_wsg50_description/urdf/lwr_with_wsg50.xacro" />
+
+  <include file="$(find tams_lwr_wsg50_moveit)/launch/planning_context.launch" >
+    <arg name="load_robot_description" value="false" />
+  </include>
+
+  <include file="$(find tams_lwr_wsg50_moveit)/launch/move_group.launch" >
+    <arg name="publish_monitored_planning_scene" value="true" />
+  </include>
+
+</launch>

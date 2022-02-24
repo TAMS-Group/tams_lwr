@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<robot
+  xmlns:xacro="http://www.ros.org/wiki/xacro" >
+  <xacro:include filename="$(find tams_lwr_wsg50_description)/urdf/xtion.gazebo.xacro" />
+
+<xacro:macro name="xtion" params="parent *origin">
+  <joint name="base_camera_joint" type="fixed">
+    <xacro:insert_block name="origin" />
+    <parent link="${parent}"/>
+    <child link="xtion_camera_link" />
+  </joint>
+
+  <link name="xtion_camera_link">
+    <inertial>
+      <mass value="0.01" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1" />
+    </inertial>
+    <visual>
+      <material name="Black" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.035 0.18 0.025" />
+	      <!-- <mesh filename="package://tams_description/meshes/kinect.dae"/> -->
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.035 0.18 0.025" />
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="xtion_camera_link">
+    <turnGravityOff>false</turnGravityOff>
+    <selfCollide>true</selfCollide>
+    <material>Gazebo/Grey</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+
+  <joint name="xtion_camera_depth_joint" type="fixed">
+    <origin xyz="0 0.0 0" rpy="0 0 0" />
+    <parent link="xtion_camera_link" />
+    <child link="xtion_camera_depth_frame" />
+  </joint>
+
+  <link name="xtion_camera_depth_frame">
+    <inertial>
+      <mass value="0.01" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
+    </inertial>
+  </link>
+
+  <joint name="xtion_camera_depth_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="xtion_camera_depth_frame" />
+    <child link="xtion_camera_depth_optical_frame" />
+  </joint>
+
+  <link name="xtion_camera_depth_optical_frame">
+    <inertial>
+      <mass value="0.001" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
+    </inertial>
+  </link>
+
+  <joint name="xtion_camera_rgb_joint" type="fixed">
+    <origin xyz="0 -0.005 0" rpy="0 0 0" />
+    <parent link="xtion_camera_link" />
+    <child link="xtion_camera_rgb_frame" />
+  </joint>
+
+  <link name="xtion_camera_rgb_frame">
+    <inertial>
+      <mass value="0.001" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1" />
+    </inertial>
+  </link>
+
+  <joint name="xtion_camera_rgb_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="xtion_camera_rgb_frame" />
+    <child link="xtion_camera_rgb_optical_frame" />
+  </joint>
+
+  <link name="xtion_camera_rgb_optical_frame">
+    <inertial>
+      <mass value="0.001" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1" />
+    </inertial>
+  </link>
+
+  <!-- Kinect sensor for simulation -->
+  <gazebo_xtion_sensor/>
+</xacro:macro>
+
+</robot>

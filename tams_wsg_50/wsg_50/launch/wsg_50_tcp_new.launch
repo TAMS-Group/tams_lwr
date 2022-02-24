@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- starts the TAMS-modified TCP-driver for the Schunk WSG-50 gripper -->
+
+  <node  name="wsg_50"  pkg="wsg_50" type="wsg_50_tcp" output="screen">
+  <param name="ip" type="string" value="192.168.0.20"/>
+  <param name="port" type="int" value="1000"/>
+   <remap from="joint_states" to="wsg_50/joint_states"/>
+  </node>
+
+</launch>

@@ -1,0 +1,540 @@
+<?xml version="1.0"?>
+<robot name="kuka_lwr_arm"
+       xmlns:xacro="http://www.ros.org/wiki/xacro"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+>
+
+  <!-- FNH
+    xacro/URDF model of the KuKA light-weight robot (LWR/LBR), based on the
+    model in $(find lwr_defs), but modified and adpated to our UHAM setup.
+
+    From the datasheet:
+    total height of robot base to A1 axis (0_joint): 280 mm,
+    total robot length from A1 axis to A5/A6 axis (wrist):  1100.5mm
+    total robot length from A1 to flange: 1178.5mm, so flange z 78.5mm
+      (which includes the custom cable adapter)
+
+
+    17.01.2017 - rename calib_... to lwr_arm_base_link
+    29.09.2016 - update transmission blocks
+    29.06.2016 - rename stuff as .xacro
+    06.08.2012 - update arm_7_link geometry from datasheet
+    03.08.2012 - remove <safety_controllers> on joint 1, otherwise torque/effort too low
+    03.08.2012 - update SimpleTransmission to pr2_mechanicsm:../SimpleTransmission
+    03.08.2012 - change joint damping from 1 to 50, add mechanicalReduction=50
+    03.08.2012 - replace real-inertia from util_defs.xml with "Gazebo/ODE"-compatible inertia terms
+    03.08.2012 - try selfCollide=false and kp kd mu1 mu2 to avoid the oscillations
+    02.08.2012 - add missing <visual> tags and things, cylinders as link7 mounting plate
+    02.08.2012 - modify world_link mess to use the robot in our UHAM setup
+
+
+  -->
+
+  <xacro:include filename="$(find tams_lwr_description)/urdf/lwr_materials.xacro" />
+  <xacro:include filename="$(find tams_lwr_description)/urdf/lwr_util_defs.xacro"/>
+  <!-- <xacro:include filename="$(find tams_lwr_description)/urdf/lwr_gazebo.xacro"/> -->
+
+  <xacro:property name="arm_elem_base_mass" value="2.0"/>
+  <xacro:property name="arm_elem_link_mass" value="2.0"/>
+  <xacro:property name="arm_elem_end_link_mass" value="2.0"/>
+  <xacro:property name="arm_elem_ball_link_mass" value="2.0"/>
+
+  <xacro:property name="arm_velocity_scale_factor" value="1"/>
+
+  <!-- right is either 1 (for right arm) or -1 (for left arm) -->
+  <xacro:macro name="kuka_lwr_arm" params="parent name right *origin">
+
+    <!-- First (shoulder) element of the arm. Fixed to its parent. -->
+    <joint name="${parent}_${name}_arm_base_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}"/>
+      <child link="${name}_arm_base_link"/>
+    </joint>
+
+    <link name="${name}_arm_base_link">
+      <inertial>
+        <mass value="${arm_elem_base_mass}"/>
+        <origin xyz="0 0 0.055"/>
+        <xacro:cylinder_inertia_def radius="0.06" length="0.11"
+                              mass="${arm_elem_base_mass}"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tams_lwr_description/meshes/lwr/arm_base.dae"/>
+        </geometry>
+        <material name="LwrOrange"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <!-- <mesh filename="package://tams_lwr_description/meshes/lwr/arm_base.dae" scale="0.99 0.99 0.99" /> -->
+          <mesh filename="package://tams_lwr_description/meshes/lwr/convex/arm_base_convex.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${name}_arm_base_link">
+      <!-- <material value="kuka-lwr.material"/> -->
+      <turnGravityOff>false</turnGravityOff>
+      <selfCollide>false</selfCollide>
+      <mu1>100.0</mu1>
+      <mu2>100.0</mu2>
+      <kp>1000000.0</kp>
+      <kd>1.0</kd>
+    </gazebo>
+
+    <!-- Second segment of the arm. Joint along z-axis, effort 204 too weak -->
+    <joint name="${name}_arm_0_joint" type="revolute">
+      <origin xyz="0 0 0.11" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-170 * pi / 180}" upper="${170 * pi / 180}"
+             effort="500" velocity="${arm_velocity_scale_factor * 110 * pi / 180}" />
+      <safety_controller soft_lower_limit="${-168 * pi / 180}"
+                         soft_upper_limit="${168 * pi / 180}"
+                         k_position="30"
+                         k_velocity="30"/>
+      <dynamics damping="30.0"/>
+      <parent link="${name}_arm_base_link"/>
+      <child link="${name}_arm_1_link"/>
+    </joint>
+
+    <transmission name="${name}_arm_0_joint_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${name}_arm_0_joint_motor" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>100</mechanicalReduction>
+      </actuator>
+      <joint name="${name}_arm_0_joint" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>100</mechanicalReduction>
+      <motorTorqueConstant>50</motorTorqueConstant>
+      <pulsesPerRevolution>10000</pulsesPerRevolution>
+    </transmission>
+
+    <link name="${name}_arm_1_link">
+      <inertial>
+        <mass value="${arm_elem_link_mass}"/>
+        <origin rpy="0 0 0" xyz="0 -0.06 0.130"/>
+        <xacro:cuboid_inertia_def length="0.12" width="0.06" height="0.260"
+                            mass="${arm_elem_link_mass}"/>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_a.dae"/>
+        </geometry>
+        <material name="LwrOrange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <!-- <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_a.dae" scale="0.99 0.99 0.99" /> -->
+          <mesh filename="package://tams_lwr_description/meshes/lwr/convex/arm_segment_a_convex.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="${name}_arm_1_link">
+      <!-- <material value="kuka-lwr.material"/> -->
+      <turnGravityOff>false</turnGravityOff>
+      <selfCollide>false</selfCollide>
+      <mu1>100.0</mu1>
+      <mu2>100.0</mu2>
+      <kp>1000000.0</kp>
+      <kd>1.0</kd>
+    </gazebo>
+
+    <joint name="${name}_arm_1_joint" type="revolute">
+      <origin xyz="0 0 0.20" rpy="${-0.5 * pi} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-120 * pi / 180}" upper="${120 * pi / 180}"
+             effort="306"  velocity="${arm_velocity_scale_factor * 110 * pi / 180}" />
+
+      <!--
+            <safety_controller soft_lower_limit="${-118 * pi / 180}"
+                               soft_upper_limit="${118 * pi / 180}"
+                               k_position="30"
+                               k_velocity="30"/>
+      -->
+      <dynamics damping="20.0" friction="10"/>
+      <parent link="${name}_arm_1_link"/>
+      <child link="${name}_arm_2_link"/>
+    </joint>
+
+    <transmission name="${name}_arm_1_joint_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${name}_arm_1_joint_motor" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>100</mechanicalReduction>
+      </actuator>
+      <joint name="${name}_arm_1_joint" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>100</mechanicalReduction>
+      <motorTorqueConstant>50</motorTorqueConstant>
+      <pulsesPerRevolution>10000</pulsesPerRevolution>
+    </transmission>
+
+    <link name="${name}_arm_2_link">
+      <inertial>
+        <mass value="${arm_elem_link_mass}"/>
+        <origin rpy="0 0 0" xyz="0 0.06 ${0.130 - 0.06}"/>
+        <xacro:cuboid_inertia_def length="0.12" width="0.06" height="0.260"
+                            mass="${arm_elem_link_mass}"/>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 -0.2 0" rpy="${-0.5 * pi} 0 0"/>
+        <geometry>
+          <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_b.dae"/>
+        </geometry>
+        <material name="LwrOrange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 -0.2 0" rpy="${-0.5 * pi} 0 0"/>
+        <geometry>
+          <!-- <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_b.dae" scale="0.99 0.99 0.99" /> -->
+          <mesh filename="package://tams_lwr_description/meshes/lwr/convex/arm_segment_b_convex.stl"/> -
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="${name}_arm_2_link">
+      <!-- <material value="kuka-lwr.material"/> -->
+      <turnGravityOff>false</turnGravityOff>
+      <selfCollide>false</selfCollide>
+      <mu1>100.0</mu1>
+      <mu2>100.0</mu2>
+      <kp>1000000.0</kp>
+      <kd>1.0</kd>
+    </gazebo>
+
+    <!-- Fourth element of the arm. z-axis -->
+    <joint name="${name}_arm_2_joint" type="revolute">
+      <origin xyz="0 -0.20 0" rpy="${0.5 * pi} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-170 * pi / 180}" upper="${170 * pi / 180}"
+             effort="204" velocity="${arm_velocity_scale_factor * 130 * pi / 180}" />
+      <safety_controller soft_lower_limit="${-168 * pi / 180}"
+                         soft_upper_limit="${168 * pi / 180}"
+                         k_position="30"
+                         k_velocity="30"/>
+      <dynamics damping="30.0"/>
+      <parent link="${name}_arm_2_link"/>
+      <child link="${name}_arm_3_link"/>
+    </joint>
+
+    <transmission name="${name}_arm_2_joint_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${name}_arm_2_joint_motor" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>100</mechanicalReduction>
+      </actuator>
+      <joint name="${name}_arm_2_joint" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>100</mechanicalReduction>
+      <motorTorqueConstant>50</motorTorqueConstant>
+      <pulsesPerRevolution>10000</pulsesPerRevolution>
+    </transmission>
+
+    <link name="${name}_arm_3_link">
+      <inertial>
+        <mass value="${arm_elem_link_mass}"/>
+        <origin rpy="0 0 0" xyz="0 0.06 0.130"/>
+        <xacro:cuboid_inertia_def length="0.12" width="0.06" height="0.260"
+                            mass="${arm_elem_link_mass}"/>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+        <geometry>
+          <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_a.dae"/>
+        </geometry>
+        <material name="LwrOrange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+        <geometry>
+          <!-- <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_a.dae" scale="0.99 0.99 0.99" /> -->
+          <mesh filename="package://tams_lwr_description/meshes/lwr/convex/arm_segment_a_convex.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="${name}_arm_3_link">
+      <!-- <material value="kuka-lwr.material"/> -->
+      <turnGravityOff>false</turnGravityOff>
+      <selfCollide>false</selfCollide>
+      <mu1>100.0</mu1>
+      <mu2>100.0</mu2>
+      <kp>1000000.0</kp>
+      <kd>1.0</kd>
+    </gazebo>
+
+    <!-- fifth element of the arm. x-axis -->
+    <joint name="${name}_arm_3_joint" type="revolute">
+      <origin xyz="0 0 0.20" rpy="${0.5 * pi} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-120 * pi / 180}" upper="${120 * pi / 180}"
+             effort="306" velocity="${arm_velocity_scale_factor * 130 * pi / 180}" />
+      <safety_controller soft_lower_limit="${-118 * pi / 180}"
+                         soft_upper_limit="${118 * pi / 180}"
+                         k_position="30"
+                         k_velocity="30"/>
+      <dynamics damping="30.0"/>
+      <parent link="${name}_arm_3_link"/>
+      <child link="${name}_arm_4_link"/>
+    </joint>
+
+    <transmission name="${name}_arm_3_joint_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${name}_arm_3_joint_motor" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>100</mechanicalReduction>
+      </actuator>
+      <joint name="${name}_arm_3_joint" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>100</mechanicalReduction>
+      <motorTorqueConstant>50</motorTorqueConstant>
+      <pulsesPerRevolution>10000</pulsesPerRevolution>
+    </transmission>
+
+    <link name="${name}_arm_4_link">
+      <inertial>
+        <mass value="${arm_elem_link_mass}"/>
+        <origin rpy="0 0 0" xyz="0 -0.06 ${0.130 - 0.06}"/>
+        <xacro:cuboid_inertia_def length="0.12" width="0.06" height="0.2600"
+                            mass="${arm_elem_link_mass}"/>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0.2 0" rpy="${0.5 * pi} ${pi} 0"/>
+        <geometry>
+          <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_b.dae"/>
+        </geometry>
+        <material name="LwrOrange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0.2 0" rpy="${0.5 * pi} ${pi} 0"/>
+        <geometry>
+          <!-- <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_b.dae" scale="0.99 0.99 0.99" /> -->
+          <mesh filename="package://tams_lwr_description/meshes/lwr/convex/arm_segment_b_convex.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="${name}_arm_4_link">
+      <!-- <material value="kuka-lwr.material"/> -->
+      <turnGravityOff>false</turnGravityOff>
+      <selfCollide>false</selfCollide>
+      <mu1>100.0</mu1>
+      <mu2>100.0</mu2>
+      <kp>1000000.0</kp>
+      <kd>1.0</kd>
+    </gazebo>
+
+    <!-- Sixth element of the arm. z-axis -->
+    <joint name="${name}_arm_4_joint" type="revolute">
+      <origin xyz="0 0.2 0.0" rpy="${-0.5 * pi} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-170 * pi / 180}" upper="${170 * pi / 180}"
+             effort="204" velocity="${arm_velocity_scale_factor * 130 * pi / 180}" />
+      <safety_controller soft_lower_limit="${-168 * pi / 180}"
+                         soft_upper_limit="${168 * pi / 180}"
+                         k_position="30"
+                         k_velocity="30"/>
+      <dynamics damping="30.0"/>
+      <parent link="${name}_arm_4_link"/>
+      <child link="${name}_arm_5_link"/>
+    </joint>
+
+    <transmission name="${name}_arm_4_joint_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${name}_arm_4_joint_motor" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>100</mechanicalReduction>
+      </actuator>
+      <joint name="${name}_arm_4_joint" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>100</mechanicalReduction>
+      <motorTorqueConstant>50</motorTorqueConstant>
+      <pulsesPerRevolution>10000</pulsesPerRevolution>
+    </transmission>
+
+    <link name="${name}_arm_5_link">
+      <inertial>
+        <mass value="${arm_elem_link_mass}"/>
+        <origin rpy="0 0 0" xyz="0 0 0.124"/>
+        <xacro:cuboid_inertia_def length="0.12" width="0.06" height="0.248"
+                            mass="${arm_elem_link_mass}"/>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry name="${name}_arm_5_geom">
+          <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_last.dae"/>
+        </geometry>
+        <material name="LwrOrange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_last.dae"/>
+          <!-- <mesh filename="package://tams_lwr_description/meshes/lwr/arm_segment_last.dae" scale="0.99 0.99 0.99" /> -->
+          <!--<mesh filename="package://tams_lwr_description/meshes/lwr/convex/arm_segment_last_convex.stl"/> -->
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="${name}_arm_5_link">
+      <!-- <material value="kuka-lwr.material"/> -->
+      <turnGravityOff>false</turnGravityOff>
+      <selfCollide>false</selfCollide>
+      <mu1>100.0</mu1>
+      <mu2>100.0</mu2>
+      <kp>1000000.0</kp>
+      <kd>1.0</kd>
+    </gazebo>
+
+    <joint name="${name}_arm_5_joint" type="revolute">
+      <origin xyz="0 0 0.19" rpy="${-0.5 * pi} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-120 * pi / 180}" upper="${120 * pi / 180}"
+             effort="306" velocity="${arm_velocity_scale_factor * 180 * pi / 180}" />
+      <safety_controller soft_lower_limit="${-118 * pi / 180}"
+                         soft_upper_limit="${118 * pi / 180}"
+                         k_position="30"
+                         k_velocity="30"/>
+      <dynamics damping="30.0"/>
+      <parent link="${name}_arm_5_link"/>
+      <child link="${name}_arm_6_link"/>
+    </joint>
+
+    <transmission name="${name}_arm_5_joint_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${name}_arm_5_joint_motor" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>100</mechanicalReduction>
+      </actuator>
+      <joint name="${name}_arm_5_joint" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>100</mechanicalReduction>
+      <motorTorqueConstant>50</motorTorqueConstant>
+      <pulsesPerRevolution>10000</pulsesPerRevolution>
+    </transmission>
+
+    <link name="${name}_arm_6_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin rpy="0 0 0" xyz="0 0 0.0625"/>
+        <xacro:cuboid_inertia_def length="0.125" width="0.125" height="0.125"
+                            mass="0.2"/>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="${0.5 * pi} 0 0"/>
+        <geometry>
+          <mesh filename="package://tams_lwr_description/meshes/lwr/arm_wrist.dae"/>
+        </geometry>
+        <material name="LwrDarkGrey"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="${0.5 * pi} 0 0"/>
+        <geometry>
+          <!-- <mesh filename="package://tams_lwr_description/meshes/lwr/arm_wrist.dae" scale="0.99 0.99 0.99" /> -->
+          <mesh filename="package://tams_lwr_description/meshes/lwr/convex/arm_wrist_convex.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="${name}_arm_6_link">
+      <!-- <material value="kuka-lwr.material"/> -->
+      <turnGravityOff>false</turnGravityOff>
+      <selfCollide>false</selfCollide>
+      <mu1>100.0</mu1>
+      <mu2>100.0</mu2>
+      <kp>1000000.0</kp>
+      <kd>1.0</kd>
+    </gazebo>
+
+    <joint name="${name}_arm_6_joint" type="revolute">
+      <origin xyz="0 -0.078 0" rpy="${0.5 * pi} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-170 * pi / 180}" upper="${170 * pi / 180}"
+             effort="204" velocity="${arm_velocity_scale_factor * 180 * pi / 180}" />
+      <safety_controller soft_lower_limit="${-168 * pi / 180}"
+                         soft_upper_limit="${168 * pi / 180}"
+                         k_position="30"
+                         k_velocity="30"/>
+      <dynamics damping="30.0"/>
+      <parent link="${name}_arm_6_link"/>
+      <child link="${name}_arm_7_link"/>
+    </joint>
+
+    <transmission name="${name}_arm_6_joint_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${name}_arm_6_joint_motor" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>100</mechanicalReduction>
+      </actuator>
+      <joint name="${name}_arm_6_joint" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>100</mechanicalReduction>
+      <motorTorqueConstant>50</motorTorqueConstant>
+      <pulsesPerRevolution>10000</pulsesPerRevolution>
+    </transmission>
+
+    <!-- simplified model of the original KuKA mounting plate -->
+    <link name="${name}_arm_7_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia  ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 -0.01" rpy="0 0 ${right * -1/4 * pi}"/>
+        <geometry>
+          <cylinder radius="${0.063/2}" length="0.02"/>
+        </geometry>
+        <material name="LwrDarkGrey"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 -0.01" rpy="0 0 ${right * -1/4 * pi}"/>
+        <geometry>
+          <cylinder radius="${0.063/2}" length="0.02"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="${name}_arm_7_link">
+      <!-- <material value="kuka-lwr.material"/> -->
+      <!-- <material>Gazebo/RedGlow</material> -->
+      <material>Gazebo/Grey</material>
+      <turnGravityOff>true</turnGravityOff>
+      <selfCollide>false</selfCollide>
+      <mu1>100.0</mu1>
+      <mu2>100.0</mu2>
+      <kp>1000000.0</kp>
+      <kd>1.0</kd>
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>

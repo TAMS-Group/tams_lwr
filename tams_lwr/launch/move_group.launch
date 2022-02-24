@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="pipeline" default="ompl" />
+
+  <include file="$(find tams_lwr_wsg50_moveit)/launch/move_group.launch" >
+    <arg name="pipeline" value="$(arg pipeline)" />
+  </include>
+
+</launch>

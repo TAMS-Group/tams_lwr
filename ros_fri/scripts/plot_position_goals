@@ -1,0 +1,26 @@
+# plot current measured joint_state efforts on the LWR arm
+#
+rosrun rqt_plot rqt_plot \
+/lwr/joint_states/velocity[0] \
+/lwr/joint_states/velocity[1] \
+/lwr/joint_states/velocity[2] \
+/lwr/joint_states/velocity[3] \
+/lwr/joint_states/velocity[4] \
+/lwr/joint_states/velocity[5] \
+/lwr/joint_states/velocity[6] \
+\
+/lwr/jointPositionGoal/TargetPositionVector[0] \
+/lwr/jointPositionGoal/TargetPositionVector[1] \
+/lwr/jointPositionGoal/TargetPositionVector[2] \
+/lwr/jointPositionGoal/TargetPositionVector[3] \
+/lwr/jointPositionGoal/TargetPositionVector[4] \
+/lwr/jointPositionGoal/TargetPositionVector[5] \
+/lwr/jointPositionGoal/TargetPositionVector[6] \
+\
+/lwr/jointPositionGoal/TargetVelocityVector[0] \
+/lwr/jointPositionGoal/TargetVelocityVector[1] \
+/lwr/jointPositionGoal/TargetVelocityVector[2] \
+/lwr/jointPositionGoal/TargetVelocityVector[3] \
+/lwr/jointPositionGoal/TargetVelocityVector[4] \
+/lwr/jointPositionGoal/TargetVelocityVector[5] \
+/lwr/jointVelocityGoal/TargetVelocityVector[6] \

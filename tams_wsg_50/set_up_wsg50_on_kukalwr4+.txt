@@ -1,0 +1,26 @@
+How to connect KUKA LWR4+ wires to WSG50 terminal strip (see terminal description at terminal strip):
+
+    Terminal    Wire Colour     Designation     Function
+    -------------------------------------------------------------------------------------------------
+    1           Black           CASE            Housing (protective conductor)
+    2           Red             +24V Logic      Supply voltage for the logic parts: 24V DC
+                                                For optional connection options Electrical connection
+    3           White           GND             Supply voltage: Mass
+    4           White/Orange    ENTD+           Ethernet: Transmit line +
+    5           Orange          ENTD-           Ethernet: Transmit line -
+    6           White/Green     ENRD+           Ethernet: Receive line +
+    7           Green           ENRD-           Ethernet: Receive line -
+
+
+Geometric dimensions and load data of WSG50 for KUKA KRC tool management:
+
+    Geometric dimensions:
+    X[mm]:  0.091       A[°]:   0
+    Y[mm]:  8.086       B[°]:   0
+    Z[mm]:  160.000     C[°]:   0
+
+    Load data:
+    M[kg]:  1.393       A[°]:   0       JX[kg*m²]:  0.003
+    X[mm]:  0.090       B[°]:   0       JY[kg*m²]:  0.003
+    Y[mm]:  8.081       C[°]:   0       JZ[kg*m²]:  0.003
+    Z[mm]:  40.000

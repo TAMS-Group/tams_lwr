@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<package>
+  <name>wsg_50</name>
+  <version>0.0.0</version>
+  <description>
+    TAMS ROS driver for the Schunk WSG-50 gripper, both CAN-bus and TCP
+    interface. Also builds a driver for the WSG-50 gripper with
+    tactile-sensing fingers from Weiss-Robotics.
+
+    Note that this version differs significantly from the original
+    upstream (rosmake) version provided by Robotnik.
+  </description>
+
+  <maintainer email="hendrich@informatik.uni-hamburg.de">Norman Hendrich</maintainer>
+  <license>BSD</license>
+  <author email="0liebrecht@informatik.uni-hamburg.de">Johannes Liebrecht</author>
+  <author email="hendrich@informatik.uni-hamburg.de">Norman Hendrich</author>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>actionlib_msgs</build_depend>
+  <build_depend>actionlib</build_depend>
+  <build_depend>wsg_50_common</build_depend>
+  <build_depend>wsg_50_simulation</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>urdf</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>actionlib_msgs</run_depend>
+  <run_depend>actionlib</run_depend>
+  <run_depend>wsg_50_common</run_depend>
+  <run_depend>wsg_50_simulation</run_depend>
+
+  <export>
+  </export>
+</package>

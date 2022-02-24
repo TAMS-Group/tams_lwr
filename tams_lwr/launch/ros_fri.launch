@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- LWR arm controller node and robot_state_publisher -->
+  <!-- limits are close to actual LWR hardware limits, check the KuKA documentation -->
+
+  <node name="lwr" pkg="ros_fri" type="ros_fri" output="screen">
+    <param name="raw_lwr_lower_joint_degrees" value="-170 -120 -170 -120 -170 -120 -170" />
+    <param name="raw_joint_velocity_limits"   value="110 110 130 130 130 180 180" />
+
+    <param name="lower_joint_limits"          value="-2.90 -2.00 -2.90 -2.00 -2.90 -2.00 -2.90" />
+    <param name="upper_joint_limits"          value="2.90 2.00 2.90 2.00 2.90 2.00 2.90" />
+    <param name="joint_velocity_limits"       value="1.90 1.90 2.25 2.25 2.25 3.14 3.14" />
+    <param name="joint_acceleration_limits"   value="0.3 0.3 0.5 0.5 0.5 0.5 0.5" />
+    <param name="joint_torque_limits"         value="200 300 200 300 200 300 200" />
+
+    <remap from="/joint_states" to="/lwr/joint_states" />
+  </node>
+
+</launch>

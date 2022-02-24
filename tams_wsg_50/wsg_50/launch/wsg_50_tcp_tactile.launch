@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- TAMS-modified TCP controller node for the Weiss/Schunk WSG-50,
+       with tactile finger sensors enabled -->
+  <node  name="wsg_50"  pkg="wsg_50" type="wsg_50_tcp_tactile">
+  <param name="ip" type="string" value="192.168.0.20"/>
+  <param name="port" type="int" value="1000"/>
+  </node>
+
+</launch>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- start per-joint gravity compensation, assuming that
+       ros_fri is already running.
+       Parameter defaults are tuned for the LWR+Schunk WSG50 setup.
+
+       2018.10.12 - fnh: new
+  -->
+
+  <node pkg="ros_fri" type="lwr_grav_comp" name="lwr_grav_comp" output="screen" >
+    <param name="command_rate" value="50.0" />
+    <param name="tool_frame"   value="tcp" />
+    <param name="robot_frame"  value="lwr_arm_base_link" />
+    <param name="effort_thresholds" value="1.0 1.0 1.0 1.0 0.5 0.5 0.5" />
+    <param name="gains" value="0.05 0.05 0.1 0.2 0.4 1.0 1.0" />
+    <param name="goal_velocities" value="0.2 0.2 0.2 0.2 0.2 0.2 0.2" />
+    <param name="averaging_weight" value="0.2" />
+
+    <remap from="ali" to="baba" />
+  </node>
+
+</launch>
