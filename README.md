@@ -1,5 +1,9 @@
 # TAMS KUKA LWR
-![kuka](doc/kuka_fig.jpg)
+
+| ![kuka](doc/kuka_fig.jpg) | ![kuka](doc/kuka_perception.png) |
+|---------------------------|----------------------------------|
+| Kuka LWR                  | Perception                       |
+
 ## Introduction
 - our setup uses the FRI (fast-research-interface) for real-time communication with the arm controller at 100Hz+. 
 - the ROS node is an improved version of the `FRILibrary` code from Torsten Kröger and the `Reflexxes-TypeII` real-time motion generation, providing joint-position goals, velocity goals, trajectory execution, and both joint and cartesian compliance modes. See the `ros_fri` package for details 
