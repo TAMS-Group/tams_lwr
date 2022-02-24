@@ -23,3 +23,6 @@ git clnoe git@git.crossmodal-learning.org:TAMS/tams_lwr.git
 
 ## Run robot with ROS
 - see [doc here](doc/run_lwr_with_ros.md) for a step to step instruction.
+
+## PDF documentations
+- All pdf are at: https://git.crossmodal-learning.org/TAMS/tams_lwr_doc
