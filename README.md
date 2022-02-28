@@ -12,13 +12,20 @@
 
 ## ROS workspace setup
 - In your workspace
-```
+```bash
 git clone https://github.com/lianghongzhuo/reflexxes_type2.git
 git clone https://github.com/lianghongzhuo/frilibrary.git
 git clone https://github.com/TAMS-Group/tams_apriltags.git
-git clnoe git@git.crossmodal-learning.org:TAMS/tams_lwr.git
+git clone git@git.crossmodal-learning.org:TAMS/tams_lwr.git
 ```
 
+or use `rosinstall` file:
+```bash
+cd src
+wget https://raw.githubusercontent.com/TAMS-Group/rosinstalls/master/melodic-tams-lwr.rosinstall
+mv melodic-tams-lwr.rosinstall .rosinstall
+wstoll update
+```
 - Build your workspace with
 `catkin build`
 
