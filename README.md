@@ -24,7 +24,7 @@ or use `rosinstall` file:
 cd src
 wget https://raw.githubusercontent.com/TAMS-Group/rosinstalls/master/melodic-tams-lwr.rosinstall
 mv melodic-tams-lwr.rosinstall .rosinstall
-wstoll update
+wstool update
 ```
 - Build your workspace with
 `catkin build`
