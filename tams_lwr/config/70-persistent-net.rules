@@ -7,4 +7,3 @@
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="F4:8E:38:A0:85:CE", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
 
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="68:05:CA:41:CB:42", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth1"
-
