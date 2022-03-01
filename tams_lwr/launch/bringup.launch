@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="launch_upload" default="true" />
-  <arg name="launch_joint_state_merger" default="false" />
+  <arg name="launch_joint_state_merger" default="true" />
   <arg name="launch_lwr" default="false" />    <!-- Kuka LWR with FRI -->
   <arg name="launch_wsg" default="true" />    <!-- Schunk WSG-50 gripper via TCP -->
   <arg name="launch_moveit" default="true" />
   <arg name="launch_rviz" default="true" />
-  <arg name="launch_mechmind" default="true" />
+  <arg name="launch_mechmind" default="false" />
   <arg name="pipeline" default="ompl" />
 
 
