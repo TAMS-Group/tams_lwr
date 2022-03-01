@@ -18,7 +18,9 @@
 
   <!-- LWR arm controller node and robot_state_publisher -->
   <group if="$(arg launch_lwr)">
-    <include file="$(find tams_lwr)/launch/ros_fri.launch" />
+    <include file="$(find ros_fri)/launch/ros_fri.launch" />
+    <!-- use ros control-->
+    <!-- <include file="$(find ros_fri)/launch/ros_fri_lwr.launch" />-->
   </group>
 
 

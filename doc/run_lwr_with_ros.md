@@ -7,7 +7,7 @@ Proceeding to run a demo (In case of error, use the complete start note):
 1. Switch to automatic mode on KRC unit
 1. Select code to run in KRC unit
 1. Release motor breaks with KRC unit
-1. Run `roslaunch tams_lwr ros_fri.launch`
+1. Run `roslaunch ros_fri ros_fri.launch` or run `roslaunch ros_fri ros_fri_lwr.launch` for ros control
     - In case of error, acknowledge with KRC unit and proceed with 4.
     - Check if appropriate tool and base frame set
     - If success, you will see the following print out:
@@ -23,7 +23,8 @@ Proceeding to run a demo (In case of error, use the complete start note):
     [ INFO] [1624095025.149383478]: ros_fri: iteration 9 state 0
     ```
     - If not, run the command above again
-1. Run `roslaunch tams_lwr bringup.launch launch_lwr:=false`
+
+1. Run `roslaunch tams_lwr bringup.launch`
 
 
 ## Complete start note
