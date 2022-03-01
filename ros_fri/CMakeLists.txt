@@ -96,6 +96,10 @@ target_link_libraries(ros_fri_lwr ${catkin_LIBRARIES} FastResearchInterfaceLibra
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
+add_executable(ros_fri_roscontrol_new src/ros_fri_roscontrol_new.cpp)
+add_dependencies(ros_fri_roscontrol_new ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ros_fri_roscontrol_new ${catkin_LIBRARIES} FastResearchInterfaceLibrary rt pthread)
+
 # add_executable(find_kuka_base_transform src/find_kuka_base_transform.cpp)
 # target_link_libraries(find_kuka_base_transform ${catkin_LIBRARIES})
 
