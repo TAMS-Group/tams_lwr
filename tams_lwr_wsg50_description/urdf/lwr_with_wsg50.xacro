@@ -133,6 +133,8 @@
     <collision>
       <geometry>
         <box size="1.5 1.0 2" />
+        <!-- for bigger workspace:-->
+        <!-- <box size="1.0 1.0 2" />-->
       </geometry>
       <material name="Grey" />
     </collision>
