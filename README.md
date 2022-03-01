@@ -5,10 +5,10 @@
 | Kuka LWR                  | Perception                       |
 
 ## Introduction
-- our setup uses the FRI (fast-research-interface) for real-time communication with the arm controller at 100Hz+. 
-- the ROS node is an improved version of the `FRILibrary` code from Torsten Kröger and the `Reflexxes-TypeII` real-time motion generation, providing joint-position goals, velocity goals, trajectory execution, and both joint and cartesian compliance modes. See the `ros_fri` package for details 
-- startup of the robot is a bit fiddly, make sure to select the correct tool and coordinate base system at startup, and see below for detailed instructions and tips [doc here](doc/kuka_quick_start_guide/quick_start_kuka.md).
-- once the KUKA controller detects a motion anomaly it basically locks up. Restart the robot and the ROS nodes.
+- Our setup uses the FRI (fast-research-interface) for real-time communication with the arm controller at 100Hz+.
+- The ROS node is an improved version of the `FRILibrary` code from Torsten Kröger and the `Reflexxes-TypeII` real-time motion generation, providing joint-position goals, velocity goals, trajectory execution, and both joint and Cartesian compliance modes. See the `ros_fri` package for details.
+- Startup of the robot is a bit fiddly, make sure to select the correct tool and coordinate base system at startup, and see below for detailed instructions and tips [doc here](doc/kuka_quick_start_guide/quick_start_kuka.md).
+- Once the KUKA controller detects a motion anomaly it basically locks up. Restart the robot and the ROS nodes.
 
 ## ROS workspace setup
 - In your workspace
@@ -36,4 +36,4 @@ wstoll update
 - see [doc here](doc/run_lwr_with_ros.md) for a step to step instruction.
 
 ## PDF documentations
-- All pdf are at: https://git.crossmodal-learning.org/TAMS/tams_lwr_doc
+- All PDF documentations are at: https://git.crossmodal-learning.org/TAMS/tams_lwr_doc
