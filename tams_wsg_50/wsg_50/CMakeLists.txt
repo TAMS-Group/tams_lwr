@@ -19,7 +19,8 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
- CATKIN_DEPENDS std_msgs sensor_msgs geometry_msgs message_runtime
+ CATKIN_DEPENDS std_msgs sensor_msgs geometry_msgs message_runtime wsg_50_common actionlib_msgs roscpp wsg_50_simulation
+ actionlib
 )
 
 

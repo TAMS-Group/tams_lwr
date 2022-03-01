@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(orocos_kdl REQUIRED)
 
 catkin_package(
- CATKIN_DEPENDS std_msgs sensor_msgs geometry_msgs message_runtime
+ CATKIN_DEPENDS std_msgs sensor_msgs geometry_msgs message_runtime roscpp
 )
 
 include_directories(
