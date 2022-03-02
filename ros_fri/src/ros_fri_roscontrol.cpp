@@ -1,30 +1,17 @@
 // ros_control interface for the KUKA LWR robot, using "Fast Research Interface"
+// - 2022, Hongzhuo Liang
 // - 2018, Philipp Ruppel
 
-#include <controller_interface/controller.h>
 #include <controller_manager/controller_manager.h>
 #include <hardware_interface/force_torque_sensor_interface.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
-#include <pluginlib/class_list_macros.h>
 #include <ros/node_handle.h>
-
-#include <RMLPositionFlags.h>
 #include <RMLPositionInputParameters.h>
 #include <RMLPositionOutputParameters.h>
-#include <RMLVelocityInputParameters.h>
-#include <RMLVelocityOutputParameters.h>
-#include <ReflexxesAPI.h>
-
 #include <FastResearchInterface.h>
 #include <LinuxAbstraction.h>
-
-#include <time.h>
-
-#include "controller_manager/controller_manager.h"
-#include "hardware_interface/actuator_state_interface.h"
-
 #include <ros/callback_queue.h>
 
 class LWR : public hardware_interface::RobotHW
@@ -66,7 +53,8 @@ class LWR : public hardware_interface::RobotHW
     std::vector<float> tmp_force_torque{ 6, 0.0 };
 
     double max_joint_step = 1.0 / 100;
-
+    ros::Time time_old_, time_new_;
+    double Position_old_[LBR_MNJ], Position_new_[LBR_MNJ];
 public:
     LWR()
     {
@@ -110,6 +98,7 @@ public:
         registerInterface(&joint_state_interface);
         registerInterface(&joint_position_interface);
         registerInterface(&force_torque_interface);
+        time_new_ = ros::Time::now();
     }
 
     // start robot
@@ -207,7 +196,15 @@ public:
         fri->GetEstimatedExternalJointTorques(tmp.data());
         eff.assign(tmp.begin(), tmp.end());
 
-        // TODO: velocities
+        // calculate velocities
+        time_old_ = time_new_;
+        time_new_ = ros::Time::now();
+        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        {
+            Position_old_[j] = Position_new_[j];
+            Position_new_[j] = pos[j];
+            vel[j] = (Position_new_[j] - Position_old_[j]) / (time_new_.toSec() - time_old_.toSec());
+        }
 
         // read tool force/torque
         fri->GetEstimatedExternalCartForcesAndTorques(tmp_force_torque.data());
@@ -269,21 +266,16 @@ public:
             }
         }
 
-        if (1)
-        {
-            fri->SetCommandedJointPositions(tmp.data());
-            prev.assign(cmd.begin(), cmd.end());
-            return true;
-        }
-
-        return false;
+        fri->SetCommandedJointPositions(tmp.data());
+        prev.assign(cmd.begin(), cmd.end());
+        return true;
     }
 };
 
 int main(int argc, char** argv)
 {
     // init ros node
-    ros::init(argc, argv, "ros_fri_roscontrol_new" /*, ros::init_options::NoSigintHandler*/);
+    ros::init(argc, argv, "ros_fri_roscontrol" /*, ros::init_options::NoSigintHandler*/);
 
     ros::NodeHandle node_handle;
 
@@ -301,7 +293,7 @@ int main(int argc, char** argv)
 
         // ros controller manager for our robot, need to periodically call update on
         // it
-        controller_manager::ControllerManager cm(&robot);  //, node_handle);
+        controller_manager::ControllerManager cm(&robot);
 
         // start robot
         if (!robot.start())
@@ -320,12 +312,7 @@ int main(int argc, char** argv)
 
         // control loop
         while (ros::ok())
-        {  // shutdown cleanly
-            /*if (!robot.ok()) {
-              // usleep(200 * 1000);
-              break;
-            }*/
-
+        {
             // read joint states from robot
             bool read_ok = robot.read();
 
