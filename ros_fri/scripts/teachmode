@@ -23,19 +23,10 @@ class TeachMode:
         rrate = rospy.Rate(fps)
         self.controller_state = None
         self.joint_torques = None
-        rospy.Subscriber(
-            controller_name + "/state",
-            control_msgs.msg.JointTrajectoryControllerState,
-            self.controller_state_callback,
-        )
-        rospy.Subscriber(
-            "/joint_states", sensor_msgs.msg.JointState, self.joint_state_callback
-        )
-        publisher = rospy.Publisher(
-            controller_name + "/command",
-            trajectory_msgs.msg.JointTrajectory,
-            queue_size=10,
-        )
+        rospy.Subscriber(controller_name + "/state", control_msgs.msg.JointTrajectoryControllerState,
+                         self.controller_state_callback)
+        rospy.Subscriber("/lwr/joint_states", sensor_msgs.msg.JointState, self.joint_state_callback)
+        publisher = rospy.Publisher(controller_name + "/command", trajectory_msgs.msg.JointTrajectory, queue_size=10)
         msg = None
         while not rospy.is_shutdown():
             rrate.sleep()
@@ -45,7 +36,7 @@ class TeachMode:
             if self.joint_torques is None:
                 print("waiting for torques")
                 continue
-            if msg is False:
+            if msg is None:
                 print("running")
                 msg = trajectory_msgs.msg.JointTrajectory()
                 msg.joint_names = self.controller_state.joint_names
@@ -65,18 +56,11 @@ class TeachMode:
 
             torques = np.array(self.joint_torques)
             for i in range(len(torques)):
-                torques[i] = (
-                    min(torque_max, max(0.0, (np.abs(torques[i]) - torque_threshold)))
-                    * np.sign(torques[i])
-                    * torque_gains[i]
-                )
+                torques[i] = (min(torque_max, max(0.0, (np.abs(torques[i]) - torque_threshold)))
+                              * np.sign(torques[i]) * torque_gains[i])
             velocities = torques * torque_speed + diffs * diff_speed
-            velocities = np.maximum(
-                velocities * 0.0, np.abs(velocities) - v_threshold
-            ) * np.sign(velocities)
-            msg.points[-1].positions = list(
-                np.array(msg.points[-1].positions) - velocities * 1.0 / fps
-            )
+            velocities = np.maximum(velocities * 0.0, np.abs(velocities) - v_threshold) * np.sign(velocities)
+            msg.points[-1].positions = list(np.array(msg.points[-1].positions) - velocities * 1.0 / fps)
             publisher.publish(msg)
 
     def controller_state_callback(self, msg):
@@ -84,10 +68,6 @@ class TeachMode:
 
     def joint_state_callback(self, msg):
         self.joint_torques = msg.effort
-
-    @staticmethod
-    def mix(a, b, f):
-        return a * (1 - f) + b * f
 
 
 if __name__ == "__main__":
