@@ -90,21 +90,8 @@ add_executable(lwr_move_to_startPose src/lwr_move_to_startPose.cpp)
 add_dependencies(lwr_move_to_startPose ${catkin_EXPORTED_TARGETS})
 target_link_libraries(lwr_move_to_startPose ReflexxesTypeII ${catkin_LIBRARIES} pthread)
 
-add_executable(ros_fri_lwr src/ros_fri_lwr.cpp)
-add_dependencies(ros_fri_lwr ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ros_fri_lwr ${catkin_LIBRARIES} FastResearchInterfaceLibrary rt pthread)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
-add_executable(ros_fri_roscontrol_new src/ros_fri_roscontrol_new.cpp)
+add_executable(ros_fri_roscontrol src/ros_fri_roscontrol.cpp)
 add_dependencies(ros_fri_roscontrol_new ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ros_fri_roscontrol_new ${catkin_LIBRARIES} FastResearchInterfaceLibrary rt pthread)
-
-# add_executable(find_kuka_base_transform src/find_kuka_base_transform.cpp)
-# target_link_libraries(find_kuka_base_transform ${catkin_LIBRARIES})
-
-# the following don't work (yet)
-# target_link_libraries(move_to_candle ${catkin_LIBRARIES} ${Boost_LIBRARIES}
-#                               FastResearchInterfaceLibrary rt ReflexxesTypeII pthread)
-# target_link_libraries(sinewave ${catkin_LIBRARIES} ${Boost_LIBRARIES}
-#                               FastResearchInterfaceLibrary rt ReflexxesTypeII pthread)

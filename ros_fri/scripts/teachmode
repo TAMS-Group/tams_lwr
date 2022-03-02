@@ -9,7 +9,7 @@ import sensor_msgs.msg
 
 class TeachMode:
     def __init__(self):
-        dtime = 0.01
+        dtime = 0.02
         torque_max = 20.0
         torque_threshold = 1.0
         diff_max = 2.0
