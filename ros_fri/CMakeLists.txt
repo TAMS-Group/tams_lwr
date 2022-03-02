@@ -93,5 +93,5 @@ target_link_libraries(lwr_move_to_startPose ReflexxesTypeII ${catkin_LIBRARIES} 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 add_executable(ros_fri_roscontrol src/ros_fri_roscontrol.cpp)
-add_dependencies(ros_fri_roscontrol_new ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ros_fri_roscontrol_new ${catkin_LIBRARIES} FastResearchInterfaceLibrary rt pthread)
+add_dependencies(ros_fri_roscontrol ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ros_fri_roscontrol ${catkin_LIBRARIES} FastResearchInterfaceLibrary rt pthread)
