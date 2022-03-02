@@ -27,7 +27,7 @@
 #        constraints:
 #          goal_time: 0.2
   </rosparam>
-  <node name="ros_fri_lwr" pkg="ros_fri" type="ros_fri_lwr" respawn="false" output="screen">
+  <node name="ros_fri_lwr" pkg="ros_fri" type="ros_fri_roscontrol_new" respawn="false" output="screen">
     <remap from="/joint_states" to="/lwr/joint_states" />
   </node>
   <node name="joint_state_controller" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller" />
