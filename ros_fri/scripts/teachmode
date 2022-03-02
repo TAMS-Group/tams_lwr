@@ -50,9 +50,7 @@ class TeachMode:
                 if np.abs(diffs[i]) >= diff_max:
                     print("ERROR")
                     exit(0)
-                diffs[i] = min(
-                    diff_max, max(0.0, (np.abs(diffs[i]) - diff_threshold))
-                ) * np.sign(diffs[i])
+                diffs[i] = min(diff_max, max(0.0, (np.abs(diffs[i]) - diff_threshold))) * np.sign(diffs[i])
 
             torques = np.array(self.joint_torques)
             for i in range(len(torques)):
