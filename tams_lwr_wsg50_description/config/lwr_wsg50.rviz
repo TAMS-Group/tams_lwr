@@ -6,11 +6,9 @@ Panels:
       Expanded:
         - /Global Options1
         - /TF1/Frames1
-        - /WrenchStamped1/Status1
+        - /ToolForceTorque1/Status1
         - /MotionPlanning1
         - /MotionPlanning1/Planned Path1
-        - /MarkerByApriltag1/Namespaces1
-        - /MarkerBySiftserver1/Namespaces1
       Splitter Ratio: 0.47923874855041504
     Tree Height: 815
   - Class: rviz/Selection
@@ -211,7 +209,7 @@ Visualization Manager:
       Force Color: 204; 51; 51
       Hide Small Values: false
       History Length: 4
-      Name: WrenchStamped
+      Name: ToolForceTorque
       Topic: /tool_force_torque
       Torque Arrow Scale: 0.019999999552965164
       Torque Color: 115; 210; 22
@@ -530,22 +528,6 @@ Visualization Manager:
         Show Robot Visual: false
       Value: true
       Velocity_Scaling_Factor: 1
-    - Class: rviz/Marker
-      Enabled: false
-      Marker Topic: /visionhub/marker_by_apriltag
-      Name: MarkerByApriltag
-      Namespaces:
-        {}
-      Queue Size: 5
-      Value: false
-    - Class: rviz/Marker
-      Enabled: false
-      Marker Topic: /siftobjects
-      Name: MarkerBySiftserver
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: false
   Enabled: true
   Global Options:
     Background Color: 208; 213; 227
@@ -570,7 +552,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.4438533782958984
+      Distance: 3.2399024963378906
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -585,10 +567,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6647996306419373
+      Pitch: 0.5947997570037842
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.250380039215088
+      Yaw: 0.10719059407711029
     Saved:
       - Class: rviz/Orbit
         Distance: 8.976840019226074
