@@ -5,6 +5,9 @@
     joint_state_controller:
       type: joint_state_controller/JointStateController
       publish_rate: 1000
+    tool_force_torque_controller:
+      type: force_torque_sensor_controller/ForceTorqueSensorController
+      publish_rate: 1000
     lwr:
       type: position_controllers/JointTrajectoryController
       joints:
@@ -32,4 +35,5 @@
   </node>
   <node name="joint_state_controller" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller" />
   <node name="position_trajectory_controller" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="lwr" />
+  <node name="tool_force_torque_controller" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="tool_force_torque_controller" />
 </launch>
