@@ -27,6 +27,8 @@ class LWR : public hardware_interface::RobotHW
 
     // ros position control interface
     hardware_interface::PositionJointInterface joint_position_interface;
+    // ros velocity control interface
+    hardware_interface::VelocityJointInterface joint_velocity_interface;
     std::vector<double> cmd, pos, vel, eff, prev;
     std::vector<float> tmp;
 
@@ -88,6 +90,9 @@ public:
             // register position control interface
             joint_position_interface.registerHandle(
                 hardware_interface::JointHandle(joint_state_interface.getHandle(joint_names[i]), &cmd[i]));
+            // register velocity control interface
+            joint_velocity_interface.registerHandle(
+                hardware_interface::JointHandle(joint_state_interface.getHandle(joint_names[i]), &cmd[i]));
         }
 
         // init end-effector force/torque interface
@@ -97,6 +102,7 @@ public:
         // register interfaces
         registerInterface(&joint_state_interface);
         registerInterface(&joint_position_interface);
+        registerInterface(&joint_velocity_interface);
         registerInterface(&force_torque_interface);
         time_new_ = ros::Time::now();
     }
