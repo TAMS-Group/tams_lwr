@@ -229,6 +229,7 @@ public:
         // check if robot is ok
         if (!(fri->IsMachineOK()))
         {
+            ROS_ERROR_STREAM("robot is not ok");
             return false;
         }
 
@@ -258,6 +259,7 @@ public:
         {
             if (std::abs(cmd[i] - prev[i]) > max_joint_step)
             {
+                ROS_ERROR_STREAM("step " << std::abs(cmd[i] - prev[i]) << "is larger than max_joint_step: "  << max_joint_step);
                 return false;
             }
         }

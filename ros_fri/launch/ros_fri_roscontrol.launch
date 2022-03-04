@@ -48,9 +48,9 @@
 #        constraints:
 #          goal_time: 0.2
   </rosparam>
-  <node name="ros_fri_roscontrol" pkg="ros_fri" type="ros_fri_roscontrol" respawn="false" output="screen">
+  <node name="ros_fri_roscontrol" pkg="ros_fri" type="ros_fri_roscontrol" respawn="false" output="screen" required="true">
     <remap from="/joint_states" to="/lwr/joint_states" />
   </node>
   <node name="position_trajectory_controller" pkg="controller_manager" type="spawner" respawn="false" output="screen"
-        args="lwr tool_force_torque_controller joint_state_controller" />
+        args="lwr tool_force_torque_controller joint_state_controller" required="true"/>
 </launch>

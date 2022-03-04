@@ -9,24 +9,23 @@ import sensor_msgs.msg
 
 class TeachMode:
     def __init__(self):
-        dtime = 0.02
+        dtime = 0.015
         torque_max = 20.0
         torque_threshold = 1.0
         diff_max = 2.0
         diff_threshold = 0.005
         v_threshold = 0.0
-        torque_speed = 0.1
+        torque_speed = 0.05
         diff_speed = 0.0
-        torque_gains = [1, 1, 1, 1, 5, 5, 10]
-        controller_name = "/lwr"
-        fps = 500
+        torque_gains = np.array([1, 1, 1, 1, 5, 5, 10])
+        fps = 100
         rrate = rospy.Rate(fps)
         self.controller_state = None
         self.joint_torques = None
-        rospy.Subscriber(controller_name + "/state", control_msgs.msg.JointTrajectoryControllerState,
+        rospy.Subscriber("/lwr/state", control_msgs.msg.JointTrajectoryControllerState,
                          self.controller_state_callback)
         rospy.Subscriber("/lwr/joint_states", sensor_msgs.msg.JointState, self.joint_state_callback)
-        publisher = rospy.Publisher(controller_name + "/command", trajectory_msgs.msg.JointTrajectory, queue_size=10)
+        publisher = rospy.Publisher("lwr/command", trajectory_msgs.msg.JointTrajectory, queue_size=10)
         msg = None
         while not rospy.is_shutdown():
             rrate.sleep()
@@ -48,6 +47,7 @@ class TeachMode:
 
             for i in range(len(diffs)):
                 if np.abs(diffs[i]) >= diff_max:
+                    print("diffs[{}] is {}, diff max is {}".format(i, np.abs(diffs[i]), diff_max))
                     print("ERROR")
                     exit(0)
                 diffs[i] = min(diff_max, max(0.0, (np.abs(diffs[i]) - diff_threshold))) * np.sign(diffs[i])
