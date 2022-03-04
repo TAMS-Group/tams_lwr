@@ -32,9 +32,9 @@
 
   <!-- joint_state merger -->
   <group if="$(arg launch_joint_state_merger)">
-    <node pkg="tams_lwr" type="joint_state_merger" name="joint_state_merger" output="log">
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+      <rosparam param="source_list">["/lwr/joint_states", "/wsg_50/joint_states"]</rosparam>
     </node>
-
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
       <param name="publish_frequency" type="double" value="100.0" />
       <param name="tf_prefix" type="string" value="" />

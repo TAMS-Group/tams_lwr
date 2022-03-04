@@ -13,11 +13,11 @@
 #include <wsg_50_common/Conf.h>
 #include <wsg_50_common/Status.h>
 
-class gripper_action_server
+class GripperActionServer
 {
 protected:
     ros::NodeHandle nh_;
-    // NodeHandle instance must be created before this line. Otherwise strange error may occur.
+    // NodeHandle instance must be created before this line. Otherwise, strange error may occur.
     actionlib::SimpleActionServer<control_msgs::GripperCommandAction> as_;
     std::string action_name_;
 
@@ -30,16 +30,16 @@ protected:
     ros::ServiceClient client_set_force_;
 
 public:
-    gripper_action_server(std::string name) : as_(nh_, name, false), action_name_(name)
+    GripperActionServer(std::string name) : as_(nh_, name, false), action_name_(name)
     {
         // register the goal and feedback callbacks
-        as_.registerGoalCallback(boost::bind(&gripper_action_server::goalCB, this));
-        as_.registerPreemptCallback(boost::bind(&gripper_action_server::preemptCB, this));
+        as_.registerGoalCallback(boost::bind(&GripperActionServer::goalCB, this));
+        as_.registerPreemptCallback(boost::bind(&GripperActionServer::preemptCB, this));
 
         client_move_ = nh_.serviceClient<wsg_50_common::Move>("wsg_50/move");
         client_set_force_ = nh_.serviceClient<wsg_50_common::Conf>("wsg_50/set_force");
 
-        sub_ = nh_.subscribe<wsg_50_common::Status>("wsg_50/status", 1, &gripper_action_server::statusCB, this);
+        sub_ = nh_.subscribe<wsg_50_common::Status>("wsg_50/status", 1, &GripperActionServer::statusCB, this);
 
         as_.start();
     }
@@ -125,7 +125,7 @@ public:
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "gripper_action_server", 1);  // 1 means no SigInt handler
-    gripper_action_server gas(ros::this_node::getName());
+    GripperActionServer gas(ros::this_node::getName());
     ros::spin();
     return 0;
 }
