@@ -257,11 +257,6 @@
     <child link="wsg_50_adapter"/>
   </joint>
 
-  <!-- the wsg_50 gripper, xyz data is from KuKA 4-point calibration
-  <xacro:wsg_50_xacro parent="wsg_50_adapter" name="wsg_50_gripper" >
-    <origin xyz="0.008086 0.000091 0.005" rpy="0 0 0" />
-  </xacro:wsg_50_xacro>
-  -->
   <!-- wsg_50 gripper with DSA tactile fingers -->
   <xacro:wsg_50_dsa parent="wsg_50_adapter" name="wsg_50_gripper">
     <origin xyz="0.008086 0.000091 0.005" rpy="0 0 0"/>
@@ -298,6 +293,5 @@
     <child link="table_top"/>
     <origin xyz="0.4 0 0" rpy="0 0 0"/>
   </joint>
-
 
 </robot>
