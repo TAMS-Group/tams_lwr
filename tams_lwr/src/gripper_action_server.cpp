@@ -27,6 +27,7 @@ protected:
 
     ros::Subscriber sub_;
     ros::ServiceClient client_move_;
+    ros::ServiceClient client_release_;
     ros::ServiceClient client_set_force_;
 
 public:
@@ -36,7 +37,8 @@ public:
         as_.registerGoalCallback(boost::bind(&GripperActionServer::goalCB, this));
         as_.registerPreemptCallback(boost::bind(&GripperActionServer::preemptCB, this));
 
-        client_move_ = nh_.serviceClient<wsg_50_common::Move>("wsg_50/move");
+        client_move_ = nh_.serviceClient<wsg_50_common::Move>("wsg_50/movehold");
+        client_release_ = nh_.serviceClient<wsg_50_common::Move>("wsg_50/release");
         client_set_force_ = nh_.serviceClient<wsg_50_common::Conf>("wsg_50/set_force");
 
         sub_ = nh_.subscribe<wsg_50_common::Status>("wsg_50/status", 1, &GripperActionServer::statusCB, this);
@@ -48,15 +50,19 @@ public:
     {  // accept goal
         goal_ = as_.acceptNewGoal()->command;
         // call goal on wsg_50
-
         wsg_50_common::Conf conf_srv;
-        conf_srv.request.val = goal_.max_effort;
+        // todo: change the max effort by topic
+        conf_srv.request.val = 40; //goal_.max_effort;
         client_set_force_.call(conf_srv);
-
         wsg_50_common::Move move_srv;
-        move_srv.request.width = goal_.position * 1000;  // from m to mm
-        move_srv.request.speed = 110;                    // max speed;
-        client_move_.call(move_srv);
+        move_srv.request.width = std::abs(goal_.position * 1000 * 2);  // from m to mm
+        move_srv.request.speed = 60;                    // max speed;
+        if (move_srv.request.width > 80){  // assume target larger than 80 mm is open griper action
+            client_release_.call(move_srv);
+        }
+        else{
+            client_move_.call(move_srv);
+        }
     }
 
     void preemptCB()
