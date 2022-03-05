@@ -10,13 +10,10 @@
   <node name="wsg_50" pkg="wsg_50" type="wsg_50_tcp_tactile" output="screen">
     <param name="ip" type="string" value="192.168.0.20"/>
     <param name="port" type="int" value="1000"/>
-    <param name="rate" type="double" value="10.0" />
-
+    <param name="rate" type="double" value="10.0" />  <!-- max 18 on our WSG50 (firmware version dependent)-->
     <remap from="joint_states" to="wsg_50/joint_states"/>
   </node>
 
-  <node name="wsg_50_gripper_action_server" pkg="tams_lwr" type="gripper_action_server"
-        output="screen" >
-  </node>
+  <node name="wsg_50_gripper_action_server" pkg="tams_lwr" type="gripper_action_server" output="screen"/>
 
 </launch>

@@ -8,7 +8,6 @@
   2016.06.29 - fnh: updated for Hydro+catkin
   -->
 
-
   <!-- LWR arm with WSG-50 gripper, tables: send urdf to param server -->
   <param name="robot_description"
          command="$(find xacro)/xacro $(find tams_lwr_wsg50_description)/urdf/lwr_with_wsg50.xacro" />

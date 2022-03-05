@@ -15,8 +15,6 @@
     <param name="gains" value="0.05 0.05 0.1 0.2 0.4 1.0 1.0" />
     <param name="goal_velocities" value="0.2 0.2 0.2 0.2 0.2 0.2 0.2" />
     <param name="averaging_weight" value="0.2" />
-
-    <remap from="ali" to="baba" />
   </node>
 
 </launch>

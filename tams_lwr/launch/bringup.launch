@@ -2,19 +2,17 @@
 <launch>
   <arg name="launch_upload" default="true" />
   <arg name="launch_joint_state_merger" default="true" />
-  <arg name="launch_lwr" default="false" />    <!-- Kuka LWR with FRI -->
+  <arg name="launch_lwr" default="false" />    <!-- Kuka LWR with FRI, set to false as we would like to run this node separately -->
   <arg name="launch_wsg" default="true" />    <!-- Schunk WSG-50 gripper via TCP -->
   <arg name="launch_moveit" default="true" />
   <arg name="launch_rviz" default="true" />
   <arg name="launch_mechmind" default="false" />
   <arg name="pipeline" default="ompl" />
 
-
   <!-- Uploads the robot_description (lwr + wsg50 + table) to the param server. -->
   <group if="$(arg launch_upload)">
     <include file="$(find tams_lwr)/launch/lwr_wsg50_upload.launch" />
   </group>
-
 
   <!-- LWR arm controller node and robot_state_publisher -->
   <group if="$(arg launch_lwr)">
@@ -23,12 +21,10 @@
     <include file="$(find ros_fri)/launch/ros_fri_roscontrol.launch" />
   </group>
 
-
   <!-- Schunk WSG-50 controller node and robot_state_publisher -->
   <group if="$(arg launch_wsg)">
     <include file="$(find tams_lwr)/launch/wsg50.launch" />
   </group>
-
 
   <!-- joint_state merger -->
   <group if="$(arg launch_joint_state_merger)">

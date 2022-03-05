@@ -233,15 +233,15 @@ public:
             return false;
         }
 
-        bool cmdAllZero = true;
+        bool cmd_all_zero = true;
         for (auto& f : cmd)
         {
             if (f != 0.0)
             {
-                cmdAllZero = false;
+                cmd_all_zero = false;
             }
         }
-        if (cmdAllZero)
+        if (cmd_all_zero)
         {
             ROS_ERROR_STREAM("all command positions are zero");
             return false;
