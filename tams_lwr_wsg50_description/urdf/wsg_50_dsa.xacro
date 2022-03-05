@@ -136,7 +136,7 @@
 
   <joint name="${name}_base_joint_gripper_right" type="prismatic">
     <limit lower="0.0027" upper="0.055" effort="1.0" velocity="1.0"/>
-    <origin xyz="0 0 0" rpy="0 0 3.14159" />
+    <origin xyz="0 0 0" rpy="0 0 ${pi}" />
     <parent link="${name}_base_link"/>
     <child link="${name}_gripper_right" />
     <axis xyz="-1 0 0"/>

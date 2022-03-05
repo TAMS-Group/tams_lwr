@@ -1,24 +1,19 @@
 <?xml version="1.0" ?>
-<robot
-        xmlns:xacro="http://www.ros.org/wiki/xacro"
-        name="lwr_with_wsg50">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="lwr_with_wsg50">
 
-  <!-- Kuka LWR with Schunk WSG-50 gripper, experiment table,
-       Kinect and web-cam. UHAM room F328 setup.
+  <!-- Kuka LWR with Schunk WSG-50 gripper, experiment table. UHAM room F329 setup.
+       05.03.2022 - change tcp frame to the original one, use pi for high accuracy transform, clean up
        23.02.2022 - add left obstacle, hide obstacle visual, change obstacle color
        29.06.2016 - catkinize'd version
        16.09.2013 - trying to calibrate the gripper precisely
        06.09.2013 - updated for Gazebo, cameras
        02.08.2013 - new file
-    -->
+  -->
 
-
-  <xacro:include filename="$(find tams_lwr_wsg50_description)/urdf/materials.xacro" />
-  <xacro:include filename="$(find tams_lwr_wsg50_description)/urdf/wsg_50_dsa.xacro" />
-
-  <xacro:include filename="$(find tams_lwr_description)/urdf/kuka_lwr_arm.xacro" />
-
-
+  <xacro:include filename="$(find tams_lwr_wsg50_description)/urdf/materials.xacro"/>
+  <xacro:include filename="$(find tams_lwr_wsg50_description)/urdf/wsg_50_dsa.xacro"/>
+  <xacro:include filename="$(find tams_lwr_description)/urdf/kuka_lwr_arm.xacro"/>
 
   <!-- this publishes joint_states according to joint transmission's -->
   <!-- note that we have no explicit namespace for the KuKA LWR -->
@@ -29,42 +24,29 @@
     </plugin>
   </gazebo>
 
-  <link name="world" />
-
-  <!-- the single green experiment table, year 2015 setup in F329  -->
-  <!--
-  <xacro:include filename="$(find tams_lwr_wsg50_description)/urdf/green_table.xacro" />
-  <xacro:green_table >
-  </xacro:green_table>
-
-  <joint name="table_joint" type="fixed">
-    <origin xyz="-0.2 0.5 0.0" rpy="0 0 -1.5710"/>
-    <parent link="world"/>
-    <child link="table_plate"/>
-  </joint>
-  -->
+  <link name="world"/>
 
   <!-- the experiment tables, current setup in F329 -->
   <!-- two large tables 180x100, two small tables 80x100 -->
   <!-- table height 0.80meters, robot at xyz=... -->
-  <link name="four_tables" >
-    <origin xyz="0 0 0" />
+  <link name="four_tables">
+    <origin xyz="0 0 0"/>
     <inertial>
-      <mass value="30.0" />
-      <origin xyz="0 0 0.4" />
-      <inertia ixx="1" ixy="0"  ixz="0" iyy="1" iyz="0" izz="1" />
+      <mass value="30.0"/>
+      <origin xyz="0 0 0.4"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
     <visual>
       <geometry>
-        <box size="2.6 2.0 0.8" />
+        <box size="2.6 2.0 0.8"/>
       </geometry>
-      <material name="White" />
+      <material name="White"/>
     </visual>
     <collision>
       <geometry>
-        <box size="2.6 2.0 0.8" />
+        <box size="2.6 2.0 0.8"/>
       </geometry>
-      <material name="Grey" />
+      <material name="Grey"/>
     </collision>
   </link>
   <gazebo reference="four_tables">
@@ -76,30 +58,30 @@
     <selfCollide>true</selfCollide>
   </gazebo>
   <joint name="four_tables_joint" type="fixed"> <!-- the experiment/lab table -->
-    <origin xyz="${-0.31} ${-0.19} 0.4" rpy="0 0 -1.5710"/>
+    <origin xyz="${-0.31} ${-0.19} 0.4" rpy="0 0 ${-pi/2}"/>
     <parent link="world"/>
     <child link="four_tables"/>
   </joint>
 
 
   <link name="monitors_and_webcam_obstacle">
-    <origin xyz="0 0 0" />
+    <origin xyz="0 0 0"/>
     <inertial>
-      <mass value="3.0" />
-      <origin xyz="0 0 0.3" />
-      <inertia ixx="1" ixy="0"  ixz="0" iyy="1" iyz="0" izz="1" />
+      <mass value="3.0"/>
+      <origin xyz="0 0 0.3"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
     <visual>
       <geometry>
-        <box size="0 0 0" />
+        <box size="0 0 0"/>
       </geometry>
-      <material name="Grey" />
+      <material name="Grey"/>
     </visual>
     <collision>
       <geometry>
-        <box size="3 1.0 2" />
+        <box size="3 1.0 2"/>
       </geometry>
-      <material name="Grey" />
+      <material name="Grey"/>
     </collision>
   </link>
   <gazebo reference="monitors_and_webcam_obstacle">
@@ -112,31 +94,31 @@
   </gazebo>
 
   <joint name="monitors_and_webcam_obstacle_joint" type="fixed"> <!-- the experiment/lab table -->
-    <origin xyz="${-0.31-1.00/2} ${0.31-1.8/2} ${0.80+0.30}" rpy="0 0 -1.5710"/>
+    <origin xyz="${-0.31-1.00/2} ${0.31-1.8/2} ${0.80+0.30}" rpy="0 0 ${-pi/2}"/>
     <parent link="world"/>
     <child link="monitors_and_webcam_obstacle"/>
   </joint>
 
   <link name="monitors_and_webcam_obstacle2">
-    <origin xyz="0 0 0" />
+    <origin xyz="0 0 0"/>
     <inertial>
-      <mass value="3.0" />
-      <origin xyz="0 0 0.3" />
-      <inertia ixx="1" ixy="0"  ixz="0" iyy="1" iyz="0" izz="1" />
+      <mass value="3.0"/>
+      <origin xyz="0 0 0.3"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
     <visual>
       <geometry>
-        <box size="0 0 0" />
+        <box size="0 0 0"/>
       </geometry>
-      <material name="Grey" />
+      <material name="Grey"/>
     </visual>
     <collision>
       <geometry>
-        <box size="1.5 1.0 2" />
+        <box size="1.5 1.0 2"/>
         <!-- for bigger workspace:-->
         <!-- <box size="1.0 1.0 2" />-->
       </geometry>
-      <material name="Grey" />
+      <material name="Grey"/>
     </collision>
   </link>
   <gazebo reference="monitors_and_webcam_obstacle2">
@@ -149,7 +131,7 @@
   </gazebo>
 
   <joint name="monitors_and_webcam_obstacle2_joint" type="fixed"> <!-- the experiment/lab table -->
-    <origin xyz="${0.2} ${-1.25} ${0.80+0.30}" rpy="0 0 -1.5710"/>
+    <origin xyz="${0.2} ${-1.25} ${0.80+0.30}" rpy="0 0 ${-pi/2}"/>
     <parent link="world"/>
     <child link="monitors_and_webcam_obstacle2"/>
   </joint>
@@ -159,21 +141,21 @@
     <inertial>
       <origin xyz="0 0 0.07" rpy="0 0 0"/>
       <mass value="3.0"/>
-      <inertia  ixx="1" ixy="0.00"  ixz="0.00"
-                iyy="1" iyz="0.00"
-                izz="1" />
+      <inertia ixx="1" ixy="0.00" ixz="0.00"
+               iyy="1" iyz="0.00"
+               izz="1"/>
     </inertial>
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.275 0.275 0.014" />
+        <box size="0.275 0.275 0.014"/>
       </geometry>
-      <material name="LightGrey" />
+      <material name="LightGrey"/>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.275 0.275 0.014" />
+        <box size="0.275 0.275 0.014"/>
       </geometry>
     </collision>
   </link>
@@ -196,8 +178,8 @@
 
   <!-- the Kuka LWR arm, relative to the world -->
   <!-- note that the robot axis defines x=y=0 in our world -->
-  <xacro:kuka_lwr_arm  parent="world" name="lwr" right="1" >
-    <origin xyz="0 0 ${0.80 + 0.0142}" rpy="0 0 0" />  <!-- table height plus base-plate height -->
+  <xacro:kuka_lwr_arm parent="world" name="lwr" right="1">
+    <origin xyz="0 0 ${0.80 + 0.0142}" rpy="0 0 0"/>  <!-- table height plus base-plate height -->
   </xacro:kuka_lwr_arm>
 
 
@@ -206,19 +188,19 @@
     <inertial>
       <origin xyz="0 0 0.005" rpy="0 0 0"/>
       <mass value="0.05"/>
-      <inertia  ixx="1" ixy="0.00"  ixz="0.00" iyy="1" iyz="0.00" izz="1" />
+      <inertia ixx="1" ixy="0.00" ixz="0.00" iyy="1" iyz="0.00" izz="1"/>
     </inertial>
     <visual>
       <origin xyz="0 0 0.0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="${0.063/2}" length="0.01" />
+        <cylinder radius="${0.063/2}" length="0.01"/>
       </geometry>
-      <material name="Black" />
+      <material name="Black"/>
     </visual>
     <collision>
       <origin xyz="0 0 0.0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="${0.063/2}" length="0.01" />
+        <cylinder radius="${0.063/2}" length="0.01"/>
       </geometry>
     </collision>
   </link>
@@ -243,19 +225,19 @@
     <inertial>
       <origin xyz="0 0 0.0025" rpy="0 0 0"/>
       <mass value="0.05"/>
-      <inertia  ixx="1" ixy="0.00"  ixz="0.00" iyy="1" iyz="0.00" izz="1" />
+      <inertia ixx="1" ixy="0.00" ixz="0.00" iyy="1" iyz="0.00" izz="1"/>
     </inertial>
     <visual>
       <origin xyz="0 0 0.0025" rpy="0 0 0"/>
       <geometry>
-        <box size="0.12 0.06 0.005" />
+        <box size="0.12 0.06 0.005"/>
       </geometry>
-      <material name="LightGrey" />
+      <material name="LightGrey"/>
     </visual>
     <collision>
       <origin xyz="0 0 0.0025" rpy="0 0 0"/>
       <geometry>
-        <box size="0.12 0.06 0.005" />
+        <box size="0.12 0.06 0.005"/>
       </geometry>
     </collision>
   </link>
@@ -270,12 +252,10 @@
     <kd>1.0</kd>
   </gazebo>
   <joint name="lwr_adapter" type="fixed">  <!-- wrist to Shadow adapter plate -->
-    <origin rpy="0 0 -1.57" xyz="0 0 0.01"/> <!-- 1 cm z offset due to thickness of kuka_adapter2 plate -->
+    <origin rpy="0 0 ${-pi/2}" xyz="0 0 0.01"/> <!-- 1 cm z offset due to thickness of kuka_adapter2 plate -->
     <parent link="lwr_arm_7_link"/>
     <child link="wsg_50_adapter"/>
   </joint>
-
-
 
   <!-- the wsg_50 gripper, xyz data is from KuKA 4-point calibration
   <xacro:wsg_50_xacro parent="wsg_50_adapter" name="wsg_50_gripper" >
@@ -283,64 +263,40 @@
   </xacro:wsg_50_xacro>
   -->
   <!-- wsg_50 gripper with DSA tactile fingers -->
-  <xacro:wsg_50_dsa  parent="wsg_50_adapter" name="wsg_50_gripper" >
-    <origin xyz="0.008086 0.000091 0.005" rpy="0 0 0" />
+  <xacro:wsg_50_dsa parent="wsg_50_adapter" name="wsg_50_gripper">
+    <origin xyz="0.008086 0.000091 0.005" rpy="0 0 0"/>
   </xacro:wsg_50_dsa>
 
-
-
-  <!-- the Asus Xtion (kinect sensor), position from automatic calibration -->
-  <!--
-  <xacro:xtion parent="world">
-    <origin xyz="-0.3 0.29  1.4"  rpy="-1.5593 0.6903 ${0.7930}" />
-  </xacro:xtion>
-  -->
-
-
-  <!-- Logitech webcam, position from automatic calibration, 2015 setup
-  <xacro:webcam parent="world" name="1" >
-    <origin xyz="-0.181 1.294 ${0.79 + 0.504}" rpy="-1.586 0.588 -1.567" />
-  </xacro:webcam>
-  -->
-
-  <!-- Microsoft LifeCam webcam, position from automatic calibration, 2016 setup  -->
-  <!-- given the broken macro, name="1" results in "webcam_1_..." which "works". -->
-  <!-- FIXME: improve the webcam xacro... -->
-  <!-- <xacro:webcam parent="world" name="1" >
-    <origin xyz="-0.2890 0.2882 1.2918" rpy="-1.5593 0.6903 0.7930" />
-  </xacro:webcam> -->
-
-
   <!-- TCP tool-center-point, center of the WSG-50 fingers -->
-  <link name="tcp" />
+  <link name="tcp"/>
 
   <joint name="tcp_joint" type="fixed">
-    <parent link="lwr_arm_7_link" />
-    <child  link="tcp" />
-    <!-- <origin xyz="0.000091 -0.008086 0.15" rpy="0 0 -1.571" /> -->
-    <origin xyz="0.000541 -0.007464 0.205" rpy="0 ${-pi/2} 0" />
+    <parent link="lwr_arm_7_link"/>
+    <child link="tcp"/>
+    <!-- <origin xyz="0.000091 -0.008086 0.15" rpy="0 0 ${-pi/2}" /> -->
+    <origin xyz="0.000541 -0.007464 0.205" rpy="0 0 ${-pi/2}"/>
   </joint>
 
-  <link name="tip" />
+  <link name="tip"/>
 
   <joint name="tip_joint" type="fixed">
-    <parent link="lwr_arm_7_link" />
-    <child  link="tip" />
-    <origin xyz="0.000091 -0.008086 0.206139" rpy="0 0 -1.57" />
+    <parent link="lwr_arm_7_link"/>
+    <child link="tip"/>
+    <origin xyz="0.000091 -0.008086 0.206139" rpy="0 0 ${-pi/2}"/>
   </joint>
-  <link name="apriltag_table" />
+  <link name="apriltag_table"/>
 
   <joint name="apriltag_table_joint" type="fixed">
-    <parent link="lwr_arm_base_link" />
-    <child  link="apriltag_table" />
-    <origin xyz="${0.136+0.047} 0 -0.016" rpy="0 0 0" />
+    <parent link="lwr_arm_base_link"/>
+    <child link="apriltag_table"/>
+    <origin xyz="${0.136+0.047} 0 -0.016" rpy="0 0 0"/>
   </joint>
-  <link name="table_top" />
+  <link name="table_top"/>
 
   <joint name="table_top_joint" type="fixed">
-    <parent link="apriltag_table" />
-    <child  link="table_top" />
-    <origin xyz="0.4 0 0" rpy="0 0 0" />
+    <parent link="apriltag_table"/>
+    <child link="table_top"/>
+    <origin xyz="0.4 0 0" rpy="0 0 0"/>
   </joint>
 
 
