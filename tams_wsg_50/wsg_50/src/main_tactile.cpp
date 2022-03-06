@@ -40,14 +40,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #include "wsg_50/common.h"
 #include "wsg_50/cmd.h"
-//#include "wsg_50/functions.h"
 
 #include <ros/ros.h>
-#include "std_msgs/String.h"
 #include "wsg_50_common/Status.h"
 #include "wsg_50_common/Move.h"
 #include "std_srvs/Empty.h"
@@ -57,38 +54,16 @@
 #include "sensor_msgs/JointState.h"
 #include "wsg_50_common/Sensor.h"
 
-//------------------------------------------------------------------------
-// Typedefs, enums, structs
-//------------------------------------------------------------------------
-
 #define GRIPPER_MAX_OPEN 110.0
 #define GRIPPER_MIN_OPEN 0.0
 
-//------------------------------------------------------------------------
-// Global variables
-//------------------------------------------------------------------------
+bool OBJECT_GRASPPED;
+status_t LAST_IMMEDIATE_RESPONSE;
+status_t LAST_ASYNC_RESPONSE;
 
-float increment;
-bool objectGraspped;
-status_t last_immediate_response;
-status_t last_async_response;
+int SOFTSTOP = 0;  // whether issue a stop command on touch sensor contact
 
-int error_count;
-int softstop = 0;  // whether issue a stop command on touch sensor contact
-
-//------------------------------------------------------------------------
-// Unit testing
-//------------------------------------------------------------------------
-
-//------------------------------------------------------------------------
-// Local function prototypes
-//------------------------------------------------------------------------
-
-//------------------------------------------------------------------------
-// Function implementation
-//------------------------------------------------------------------------
-
-int ack_fault(void);
+int ack_fault();
 
 float convert(unsigned char* b)
 {
@@ -122,7 +97,7 @@ float convert(unsigned char* b)
 // ACTUATION FUNCTIONS //
 /////////////////////////
 
-int homing(void)
+int homing()
 {
     status_t status;
     int res;
@@ -134,7 +109,7 @@ int homing(void)
     payload[0] = 0x00;
 
     // Submit command and wait for response. Push result to stack.
-    res = cmd_submit(0x20, payload, 1, true, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x20, payload, 1, true, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
 
     if (res != 2)
     {
@@ -149,7 +124,7 @@ int homing(void)
 
     // Check response status
     status = cmd_get_response_status(resp);
-    last_immediate_response = status;
+    LAST_IMMEDIATE_RESPONSE = status;
     free(resp);
     if (status != E_CMD_PENDING)
     {
@@ -181,7 +156,7 @@ int move(float width, float speed, bool hold)
 
     // Submit command and wait for response. Push result to stack.
     dbgPrint("WSG Move issuing cmd\n");
-    res = cmd_submit(0x21, payload, 9, true, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x21, payload, 9, true, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     dbgPrint("WSG Move issuing cmd returned\n");
     if (res != 2)
     {
@@ -206,7 +181,7 @@ int move(float width, float speed, bool hold)
     return status;
 }
 
-int stop(void)
+int stop()
 {
     status_t status;
     int res;
@@ -217,7 +192,7 @@ int stop(void)
     // payload[0] = 0x00;
 
     // Submit command and wait for response. Push result to stack.
-    res = cmd_submit(0x22, payload, 0, true, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x22, payload, 0, true, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 2)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 2)\n", res);
@@ -238,7 +213,7 @@ int stop(void)
     return status;
 }
 
-int ack_fault(void)
+int ack_fault()
 {
     status_t status;
     int res;
@@ -252,7 +227,7 @@ int ack_fault(void)
     payload[2] = 0x6B;
 
     // Submit command and wait for response. Push result to stack.
-    res = cmd_submit(0x24, payload, 3, true, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x24, payload, 3, true, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 2)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 2)\n", res);
@@ -287,7 +262,7 @@ int grasp(float objWidth, float speed)
     memcpy(&payload[4], &speed, sizeof(float));
 
     // Submit command and wait for response. Push result to stack.
-    res = cmd_submit(0x25, payload, 8, true, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x25, payload, 8, true, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 2)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 2)\n", res);
@@ -321,7 +296,7 @@ int release(float width, float speed)
     memcpy(&payload[4], &speed, sizeof(float));
 
     // Submit command and wait for response. Push result to stack.
-    res = cmd_submit(0x26, payload, 8, true, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x26, payload, 8, true, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 2)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 2)\n", res);
@@ -365,7 +340,7 @@ int setAcceleration(float acc)
     memcpy(&payload[0], &acc, sizeof(float));
 
     // Submit command and wait for response. Push result to stack.
-    res = cmd_submit(0x30, payload, 4, true, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x30, payload, 4, true, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 2)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 2)\n", res);
@@ -398,7 +373,7 @@ int setGraspingForceLimit(float force)
     memcpy(&payload[0], &force, sizeof(float));
 
     // Submit command and wait for response. Push result to stack.
-    res = cmd_submit(0x32, payload, 4, true, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x32, payload, 4, true, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 2)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 2)\n", res);
@@ -423,7 +398,7 @@ int setGraspingForceLimit(float force)
 // GET FUNCTIONS //
 ///////////////////
 
-const char* systemState(void)
+const char* systemState()
 {
     status_t status;
     int res;
@@ -435,13 +410,13 @@ const char* systemState(void)
     memset(payload, 0, 3);
 
     // Submit command and wait for response. Expecting exactly 4 bytes response payload.
-    res = cmd_submit(0x40, payload, 3, false, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x40, payload, 3, false, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 6)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 6)\n", res);
         if (res > 0)
             free(resp);
-        return 0;
+        return nullptr;
     }
 
     // Check response status
@@ -460,7 +435,7 @@ const char* systemState(void)
     {
         dbgPrint("Command GET SYSTEM STATE not successful: %s\n", status_to_str(status));
         free(resp);
-        return 0;
+        return nullptr;
     }
 
     free(resp);
@@ -468,7 +443,7 @@ const char* systemState(void)
     // return (int) resp[2]; MBJ
 }
 
-int graspingState(void)
+int graspingState()
 {
     status_t status;
     int res;
@@ -480,7 +455,7 @@ int graspingState(void)
     memset(payload, 0, 3);
 
     // Submit command and wait for response. Expecting exactly 4 bytes response payload.
-    res = cmd_submit(0x41, payload, 3, false, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x41, payload, 3, false, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 3)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 3)\n", res);
@@ -511,20 +486,20 @@ int graspingState(void)
     return (int)resp[2];
 }
 
-int getOpening(void)
+int getOpening()
 {
     status_t status;
     int res;
     unsigned char payload[3];
     unsigned char* resp;
     unsigned int resp_len;
-    unsigned char vResult[4];
+    unsigned char v_result[4];
 
     // Don't use automatic update, so the payload bytes are 0.
     memset(payload, 0, 3);
 
     // Submit command and wait for response. Expecting exactly 4 bytes response payload.
-    res = cmd_submit(0x43, payload, 3, false, &resp, &resp_len, &last_async_response);  // 0x43
+    res = cmd_submit(0x43, payload, 3, false, &resp, &resp_len, &LAST_ASYNC_RESPONSE);  // 0x43
     if (res != 6)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 3)\n", res);
@@ -550,34 +525,34 @@ int getOpening(void)
         return 0;
     }
 
-    vResult[0] = resp[2];
-    vResult[1] = resp[3];
-    vResult[2] = resp[4];
-    vResult[3] = resp[5];
+    v_result[0] = resp[2];
+    v_result[1] = resp[3];
+    v_result[2] = resp[4];
+    v_result[3] = resp[5];
 
     // dbgPrint("OPENING WIDTH: %f mm\n", convert(vResult));
 
     free(resp);
 
-    return convert(vResult);
+    return convert(v_result);
 
     // return (int) resp[2];
 }
 
-int getForce(void)
+int getForce()
 {
     status_t status;
     int res;
     unsigned char payload[3];
     unsigned char* resp;
     unsigned int resp_len;
-    unsigned char vResult[4];
+    unsigned char v_result[4];
 
     // Don't use automatic update, so the payload bytes are 0.
     memset(payload, 0, 3);
 
     // Submit command and wait for response. Expecting exactly 4 bytes response payload.
-    res = cmd_submit(0x45, payload, 3, false, &resp, &resp_len, &last_async_response);  // 0x43
+    res = cmd_submit(0x45, payload, 3, false, &resp, &resp_len, &LAST_ASYNC_RESPONSE);  // 0x43
     if (res != 6)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 3)\n", res);
@@ -595,32 +570,32 @@ int getForce(void)
         return 0;
     }
 
-    vResult[0] = resp[2];
-    vResult[1] = resp[3];
-    vResult[2] = resp[4];
-    vResult[3] = resp[5];
+    v_result[0] = resp[2];
+    v_result[1] = resp[3];
+    v_result[2] = resp[4];
+    v_result[3] = resp[5];
 
     free(resp);
 
-    return convert(vResult);
+    return convert(v_result);
 
     // return (int) resp[2];
 }
 
-int getAcceleration(void)
+int getAcceleration()
 {
     status_t status;
     int res;
     unsigned char payload[6];
     unsigned char* resp;
     unsigned int resp_len;
-    unsigned char vResult[4];
+    unsigned char v_result[4];
 
     // Don't use automatic update, so the payload bytes are 0.
     memset(payload, 0, 1);
 
     // Submit command and wait for response. Expecting exactly 4 bytes response payload.
-    res = cmd_submit(0x31, payload, 0, false, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x31, payload, 0, false, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 6)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 3)\n", res);
@@ -638,32 +613,32 @@ int getAcceleration(void)
         return 0;
     }
 
-    vResult[0] = resp[2];
-    vResult[1] = resp[3];
-    vResult[2] = resp[4];
-    vResult[3] = resp[5];
+    v_result[0] = resp[2];
+    v_result[1] = resp[3];
+    v_result[2] = resp[4];
+    v_result[3] = resp[5];
 
     free(resp);
 
-    return convert(vResult);
+    return convert(v_result);
 
     // return (int) resp[2];
 }
 
-int getGraspingForceLimit(void)
+int getGraspingForceLimit()
 {
     status_t status;
     int res;
     unsigned char payload[6];
     unsigned char* resp;
     unsigned int resp_len;
-    unsigned char vResult[4];
+    unsigned char v_result[4];
 
     // Don't use automatic update, so the payload bytes are 0.
     memset(payload, 0, 1);
 
     // Submit command and wait for response. Expecting exactly 4 bytes response payload.
-    res = cmd_submit(0x33, payload, 0, false, &resp, &resp_len, &last_async_response);
+    res = cmd_submit(0x33, payload, 0, false, &resp, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 6)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 3)\n", res);
@@ -681,14 +656,14 @@ int getGraspingForceLimit(void)
         return 0;
     }
 
-    vResult[0] = resp[2];
-    vResult[1] = resp[3];
-    vResult[2] = resp[4];
-    vResult[3] = resp[5];
+    v_result[0] = resp[2];
+    v_result[1] = resp[3];
+    v_result[2] = resp[4];
+    v_result[3] = resp[5];
 
     free(resp);
 
-    return convert(vResult);
+    return convert(v_result);
 
     // return (int) resp[2];
 }
@@ -706,7 +681,7 @@ int getFingerSensorData(wsg_50_common::Sensor* psensor_msg)
     // read sensor data from finger 0
     memset(payload, 0, 1);
     // Submit command and wait for response. Expecting exactly 174 bytes response payload.
-    res = cmd_submit(0x63, payload, 1, false, &resp0, &resp_len, &last_async_response);
+    res = cmd_submit(0x63, payload, 1, false, &resp0, &resp_len, &LAST_ASYNC_RESPONSE);
     if (res != 174)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 174)\n", res);
@@ -735,7 +710,7 @@ int getFingerSensorData(wsg_50_common::Sensor* psensor_msg)
     // read sensor data from finger 1
     memset(payload1, 1, 1);
     // Submit command and wait for response. Expecting exactly 174 bytes response payload.
-    res1 = cmd_submit(0x63, payload1, 1, false, &resp1, &resp_len1, &last_async_response);
+    res1 = cmd_submit(0x63, payload1, 1, false, &resp1, &resp_len1, &LAST_ASYNC_RESPONSE);
     if (res1 != 174)
     {
         dbgPrint("Response payload length doesn't match (is %d, expected 174)\n", res1);
@@ -850,7 +825,7 @@ bool graspSrv(wsg_50_common::Move::Request& req, wsg_50_common::Move::Response& 
     }
 
     ROS_INFO("Object grasped correctly.");
-    objectGraspped = true;
+    OBJECT_GRASPPED = true;
     // pthread_mutex_unlock( &mutex );
     return true;
 }
@@ -860,53 +835,53 @@ bool incrementSrv(wsg_50_common::Incr::Request& req, wsg_50_common::Incr::Respon
     // pthread_mutex_lock( &mutex );
     if (req.direction == "open")
     {
-        if (!objectGraspped)
+        if (!OBJECT_GRASPPED)
         {
-            float currentWidth = getOpening();
-            float nextWidth = currentWidth + req.increment;
-            if ((currentWidth < GRIPPER_MAX_OPEN) && nextWidth < GRIPPER_MAX_OPEN)
+            float current_width = getOpening();
+            float next_width = current_width + req.increment;
+            if ((current_width < GRIPPER_MAX_OPEN) && next_width < GRIPPER_MAX_OPEN)
             {
                 // grasp(nextWidth, 1);
-                move(nextWidth, 20, false);
-                currentWidth = nextWidth;
+                move(next_width, 20, false);
+                current_width = next_width;
             }
-            else if (nextWidth >= GRIPPER_MAX_OPEN)
+            else if (next_width >= GRIPPER_MAX_OPEN)
             {
                 // grasp(GRIPPER_MAX_OPEN, 1);
                 move(GRIPPER_MAX_OPEN, 1, false);
-                currentWidth = GRIPPER_MAX_OPEN;
+                current_width = GRIPPER_MAX_OPEN;
             }
         }
         else
         {
             ROS_INFO("Releasing object...");
             release(GRIPPER_MAX_OPEN, 20);
-            objectGraspped = false;
+            OBJECT_GRASPPED = false;
         }
     }
     else if (req.direction == "close")
     {
-        if (!objectGraspped)
+        if (!OBJECT_GRASPPED)
         {
-            float currentWidth = getOpening();
-            float nextWidth = currentWidth - req.increment;
+            float current_width = getOpening();
+            float next_width = current_width - req.increment;
 
-            if ((currentWidth > GRIPPER_MIN_OPEN) && nextWidth > GRIPPER_MIN_OPEN)
+            if ((current_width > GRIPPER_MIN_OPEN) && next_width > GRIPPER_MIN_OPEN)
             {
                 // grasp(nextWidth, 1);
-                move(nextWidth, 20, false);
-                currentWidth = nextWidth;
+                move(next_width, 20, false);
+                current_width = next_width;
             }
-            else if (nextWidth <= GRIPPER_MIN_OPEN)
+            else if (next_width <= GRIPPER_MIN_OPEN)
             {
                 // grasp(GRIPPER_MIN_OPEN, 1);
                 move(GRIPPER_MIN_OPEN, 1, false);
-                currentWidth = GRIPPER_MIN_OPEN;
+                current_width = GRIPPER_MIN_OPEN;
             }
         }
     }
     // pthread_mutex_unlock( &mutex );
-    return true;  // FNH: FIXME
+    return true;
 }
 
 bool releaseSrv(wsg_50_common::Move::Request& req, wsg_50_common::Move::Response& res)
@@ -959,7 +934,7 @@ bool softstopSrv(std_srvs::Empty::Request& req, std_srvs::Empty::Request& res)
 {
     ROS_WARN("Initialize SoftStop!");
     // pthread_mutex_lock( &mutex );
-    softstop = 1;
+    SOFTSTOP = 1;
     // pthread_mutex_unlock( &mutex );
     return true;
 }
@@ -968,7 +943,7 @@ bool cancelsoftstopSrv(std_srvs::Empty::Request& req, std_srvs::Empty::Request& 
 {
     ROS_WARN("cancel SoftStop!\n");
     // pthread_mutex_lock( &mutex );
-    softstop = 0;
+    SOFTSTOP = 0;
     // pthread_mutex_unlock( &mutex );
     return true;
 }
@@ -1016,39 +991,6 @@ bool checkforsoftstop(wsg_50_common::Sensor sensor_msg)
     return result;
 }
 
-/*
-void timerCallback( const ros::TimerEvent& timerEvent ) {
- // TimerEvent :->  Time ->sec,nscec
-  n_timer_callbacks++;
-  if ((n_timer_callbacks < 5) || ((n_timer_callbacks % (60*100)) == 0)) { // once per minute at 100Hz
-    ROS_INFO( "WSG50 timerCallback at %d, %d", timerEvent.current_real.sec, n_timer_callbacks );
-  }
-
-  joint_states.header.stamp = ros::Time::now();
-  joint_states_pub.publish( joint_states );
-
-
-  unsigned int N = jointNames.size();
-  sensor_msgs::JointState jsmsg;
-  jsmsg.header.seq = n_timer_callbacks;
-  jsmsg.header.stamp = ros::Time::now();
-  jsmsg.header.frame_id = std::string( "doro_joint_states" );
-
-  jsmsg.name.resize( N );
-  jsmsg.position.resize( N );
-  jsmsg.velocity.resize( N );
-  jsmsg.effort.resize( N );
-  for( unsigned int i=0; i < N; i++ ) {
-    jsmsg.name[i]     = jointNames[i];
-    jsmsg.position[i] = jointAngles[i];
-    jsmsg.velocity[i] = jointVelocities[i];
-    jsmsg.effort[i]   = jointTorques[i];
-  }
-  jointStatePublisher.publish( jsmsg );
-
-}
-*/
-
 /**
  * The main function
  */
@@ -1068,7 +1010,7 @@ int main(int argc, char** argv)
     double rate;
 
     status_t laststate = (status_t)0;
-    last_async_response = (status_t)0;
+    LAST_ASYNC_RESPONSE = (status_t)0;
 
     ROS_INFO("WSG-50 - ROS NODE");
     nnh.param("ip", ip, std::string("192.168.0.20"));
@@ -1081,7 +1023,7 @@ int main(int argc, char** argv)
     //
     if (cmd_connect_tcp(ip.c_str(), port) == 0)
     {
-        ROS_INFO("WSG-50: TCP connection stablished");
+        ROS_INFO("WSG-50: TCP connection established");
         ack_fault();  // keep Lua happy
         usleep(20000);
 
@@ -1090,19 +1032,19 @@ int main(int argc, char** argv)
 
         // setup ROS services
         //
-        ros::ServiceServer moveSS = nh.advertiseService("move", moveSrv);
-        ros::ServiceServer moveholdSS = nh.advertiseService("movehold", moveholdSrv);
-        ros::ServiceServer graspSS = nh.advertiseService("grasp", graspSrv);
-        ros::ServiceServer releaseSS = nh.advertiseService("release", releaseSrv);
-        ros::ServiceServer homingSS = nh.advertiseService("homing", homingSrv);
-        ros::ServiceServer stopSS = nh.advertiseService("stop", stopSrv);
-        ros::ServiceServer softstopSS = nh.advertiseService("softstop", softstopSrv);
-        ros::ServiceServer cancelsoftstopSS = nh.advertiseService("cancelsoftstop", cancelsoftstopSrv);
-        ros::ServiceServer ackSS = nh.advertiseService("ack", ackSrv);
+        ros::ServiceServer move_ss = nh.advertiseService("move", moveSrv);
+        ros::ServiceServer movehold_ss = nh.advertiseService("movehold", moveholdSrv);
+        ros::ServiceServer grasp_ss = nh.advertiseService("grasp", graspSrv);
+        ros::ServiceServer release_ss = nh.advertiseService("release", releaseSrv);
+        ros::ServiceServer homing_ss = nh.advertiseService("homing", homingSrv);
+        ros::ServiceServer stop_ss = nh.advertiseService("stop", stopSrv);
+        ros::ServiceServer softstop_ss = nh.advertiseService("softstop", softstopSrv);
+        ros::ServiceServer cancelsoftstop_ss = nh.advertiseService("cancelsoftstop", cancelsoftstopSrv);
+        ros::ServiceServer ack_ss = nh.advertiseService("ack", ackSrv);
 
-        ros::ServiceServer incrementSS = nh.advertiseService("move_incrementally", incrementSrv);
-        ros::ServiceServer setAccSS = nh.advertiseService("set_acceleration", setAccSrv);
-        ros::ServiceServer setForceSS = nh.advertiseService("set_force", setForceSrv);
+        ros::ServiceServer increment_ss = nh.advertiseService("move_incrementally", incrementSrv);
+        ros::ServiceServer set_acc_ss = nh.advertiseService("set_acceleration", setAccSrv);
+        ros::ServiceServer set_force_ss = nh.advertiseService("set_force", setForceSrv);
 
         // publishers
         //
@@ -1118,11 +1060,11 @@ int main(int argc, char** argv)
         int last_op = 0;                 // previous opening in mm, to calculate velocity
         double vel = 0;
         unsigned int iteration = 0;
-        int tactileSensorResult = 0;
+        int tactile_sensor_result = 0;
         const char * aux;
         ros::Rate loop_rate(rate);  // loop at user-selected rate
-        ros::Time lastUpdateTime = ros::Time::now();
-        ros::Time lastOpUpdateTime = ros::Time::now();
+        ros::Time last_update_time = ros::Time::now();
+        ros::Time last_op_update_time = ros::Time::now();
 
         while (ros::ok())
         {
@@ -1133,11 +1075,11 @@ int main(int argc, char** argv)
             // Create the msg to send
             // Get state values
 
-            ros::Duration dt = ros::Time::now() - lastUpdateTime;
+            ros::Duration dt = ros::Time::now() - last_update_time;
             // if (dt.toSec() > 0.5) {
-            if (42)
+            while (true)
             {
-                lastUpdateTime = ros::Time::now();
+                last_update_time = ros::Time::now();
                 // pthread_mutex_lock( &mutex );
 
                 aux = systemState();
@@ -1145,9 +1087,9 @@ int main(int argc, char** argv)
                 // ROS_INFO( "Time after get system state  %6.3f \n", dt.toSec() );
                 last_op = op;
                 op = getOpening();
-                vel = (op - last_op) / 2000.0 / (ros::Time::now() - lastOpUpdateTime).toSec();
-                lastOpUpdateTime = ros::Time::now();
-                dt = ros::Time::now() - lastUpdateTime;
+                vel = (op - last_op) / 2000.0 / (ros::Time::now() - last_op_update_time).toSec();
+                last_op_update_time = ros::Time::now();
+                dt = ros::Time::now() - last_update_time;
                 // ROS_INFO( "Time after get opening  %6.3f \n", dt.toSec() );
                 // usleep(20000);
                 ros::spinOnce();
@@ -1155,28 +1097,28 @@ int main(int argc, char** argv)
                 ros::spinOnce();
                 force = getForce();
 
-                dt = ros::Time::now() - lastUpdateTime;
+                dt = ros::Time::now() - last_update_time;
                 // ROS_INFO( "Time after get force  %6.3f \n", dt.toSec() );
                 ros::spinOnce();
 
                 // publish tactile sensor information
-                tactileSensorResult = getFingerSensorData(&sensor_msg);
-                if (tactileSensorResult != 0)
+                tactile_sensor_result = getFingerSensorData(&sensor_msg);
+                if (tactile_sensor_result != 0)
                 {
                     sensor_pub.publish(sensor_msg);
-                    if (softstop > 0)
+                    if (SOFTSTOP > 0)
                         checkforsoftstop(sensor_msg);
                 }
-                dt = ros::Time::now() - lastUpdateTime;
+                dt = ros::Time::now() - last_update_time;
                 // ROS_INFO( "Time after get tactile  %6.3f \n", dt.toSec() );
                 ros::spinOnce();
             }  // if (42)...
 
-            if (laststate != last_async_response)
+            if (laststate != LAST_ASYNC_RESPONSE)
             {
-                ROS_INFO("Changing Last Async Response to %s.\n", status_to_str(last_async_response));
-                printf("Changing Last Async Response to %s.\n", status_to_str(last_async_response));
-                laststate = last_async_response;
+                ROS_INFO("Changing Last Async Response to %s.\n", status_to_str(LAST_ASYNC_RESPONSE));
+                printf("Changing Last Async Response to %s.\n", status_to_str(LAST_ASYNC_RESPONSE));
+                laststate = LAST_ASYNC_RESPONSE;
                 // publish message
             }
 
@@ -1209,7 +1151,7 @@ int main(int argc, char** argv)
 
             // ROS_INFO( "entering spin\n" );
             ros::spinOnce();
-            dt = ros::Time::now() - lastUpdateTime;
+            dt = ros::Time::now() - last_update_time;
             // ROS_INFO( "Time at loop end %6.3f \n", dt.toSec() );
             // ROS_INFO( "spin finished\n" );
         }
@@ -1225,7 +1167,3 @@ int main(int argc, char** argv)
 
     return 0;
 }
-
-//------------------------------------------------------------------------
-// Testing functions
-//------------------------------------------------------------------------
