@@ -53,6 +53,8 @@ public:
         wsg_50_common::Conf conf_srv;
         // todo: change the max effort by topic
         conf_srv.request.val = 40; //goal_.max_effort;
+        // by using this print, we found that the goal sending by moveit is a negative value!
+        // ROS_ERROR_STREAM("gripper command is: [" << goal_ << "]  from gripper action server");
         client_set_force_.call(conf_srv);
         wsg_50_common::Move move_srv;
         move_srv.request.width = std::abs(goal_.position * 1000 * 2);  // from m to mm
@@ -111,19 +113,7 @@ public:
         }
 
         as_.publishFeedback(feedback_);
-
-        if (result_.reached_goal)
-        {
-            ROS_INFO("%s: Succeeded", action_name_.c_str());
-            // set the action state to succeeded
-            as_.setSucceeded(result_);
-        }
-        else
-        {
-            ROS_INFO("%s: Aborted", action_name_.c_str());
-            // set the action state to aborted
-            as_.setAborted(result_);
-        }
+        as_.setSucceeded(result_);  // success no matter what result I get to make moveit happy
     }
 
 };  // class gripper_action_server

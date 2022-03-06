@@ -41,9 +41,6 @@ controller_list:
     action_ns: ""
     default: True
     type: GripperCommand
-# todo: test if this works in real robot
-#    allowed_execution_duration_scaling: 5.0
-#    allowed_goal_duration_margin: 0.5
     joints:
       - wsg_50_gripper_base_joint_gripper_left
       - wsg_50_gripper_base_joint_gripper_right

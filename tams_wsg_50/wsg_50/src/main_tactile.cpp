@@ -332,6 +332,13 @@ int release(float width, float speed)
 
     // Check response status
     status = cmd_get_response_status(resp);
+    // In case the command result is not available immediately, e.g. on
+    // movement or referencing commands, the gripper module returns
+    // a notification that it did understand the received command and
+    // started its execution (command pending). However, the result will
+    // be sent in an additional packet after the command execution has
+    // completed. The immediate response to such an asynchronous
+    // command will be a packet with E_CMD_PENDING as status code
     free(resp);
     if (status != E_SUCCESS)
     {
@@ -1112,7 +1119,7 @@ int main(int argc, char** argv)
         double vel = 0;
         unsigned int iteration = 0;
         int tactileSensorResult = 0;
-
+        const char * aux;
         ros::Rate loop_rate(rate);  // loop at user-selected rate
         ros::Time lastUpdateTime = ros::Time::now();
         ros::Time lastOpUpdateTime = ros::Time::now();
@@ -1133,7 +1140,7 @@ int main(int argc, char** argv)
                 lastUpdateTime = ros::Time::now();
                 // pthread_mutex_lock( &mutex );
 
-                // aux = systemState();
+                aux = systemState();
                 // dt = ros::Time::now() - lastUpdateTime;
                 // ROS_INFO( "Time after get system state  %6.3f \n", dt.toSec() );
                 last_op = op;
@@ -1191,6 +1198,14 @@ int main(int argc, char** argv)
             joint_states_pub.publish(joint_states);
             ros::spinOnce();
             loop_rate.sleep();
+
+            std::stringstream ss;
+            ss << aux;
+            status_msg.status = ss.str();
+            status_msg.width = op;
+            status_msg.acc = acc;
+            status_msg.force = force;
+            state_pub.publish(status_msg);//only useless crap, better to be implemented as a service instead
 
             // ROS_INFO( "entering spin\n" );
             ros::spinOnce();
