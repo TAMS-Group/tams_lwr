@@ -1078,7 +1078,7 @@ int main(int argc, char** argv)
         ack_fault();  // keep Lua happy
         usleep(20000);
 
-        // homing();
+        homing();
         usleep(20000);
 
         // setup ROS services

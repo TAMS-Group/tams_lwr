@@ -47,7 +47,7 @@ set(DRIVER_SOURCES
 
 
 add_executable(wsg_50_tcp src/main_new.cpp ${DRIVER_SOURCES})
-add_executable(wsg_50_tcp_tactile src/main_debug.cpp ${DRIVER_SOURCES})
+add_executable(wsg_50_tcp_tactile src/main_tactile.cpp ${DRIVER_SOURCES})
 
 # WSG_50_CAN version
 #add_executable(wsg_50_can src/main_can.cpp src/checksum.cpp src/msg.c src/common.cpp src/functions_can.cpp)
