@@ -3,7 +3,7 @@
   <name>tams_lwr_wsg50_moveit</name>
   <version>0.3.0</version>
   <description>
-     An automatically generated package with all the configuration and launch files for using the lwr_with_wsg50 with the MoveIt Motion Planning Framework
+     An automatically generated package with all the configuration and launch files for using the lwr_with_wsg50 with the MoveIt! Motion Planning Framework
   </description>
   <author email="liang@informatik.uni-hamburg.de">Hongzhuo Liang</author>
   <maintainer email="liang@informatik.uni-hamburg.de">Hongzhuo Liang</maintainer>

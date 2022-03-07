@@ -43,8 +43,8 @@
         <joint name="wsg_50_gripper_base_joint_gripper_right" value="0.05" />
     </group_state>
     <group_state name="close" group="gripper">
-        <joint name="wsg_50_gripper_base_joint_gripper_left" value="-0.0027" />
-        <joint name="wsg_50_gripper_base_joint_gripper_right" value="0.0027" />
+        <joint name="wsg_50_gripper_base_joint_gripper_left" value="-0.004" />
+        <joint name="wsg_50_gripper_base_joint_gripper_right" value="0.004" />
     </group_state>
     <group_state name="grasp_default" group="arm">
         <joint name="lwr_arm_0_joint" value="0" />
