@@ -51,10 +51,10 @@ public:
         goal_ = as_.acceptNewGoal()->command;
         // call goal on wsg_50
         wsg_50_common::Conf conf_srv;
-        // todo: change the max effort by topic
-        conf_srv.request.val = 40; //goal_.max_effort;
-        // by using this print, we found that the goal sending by moveit is a negative value!
-        // ROS_ERROR_STREAM("gripper command is: [" << goal_ << "]  from gripper action server");
+        if (goal_.max_effort == 0){
+            goal_.max_effort = 40;
+        }
+        conf_srv.request.val = goal_.max_effort;
         client_set_force_.call(conf_srv);
         wsg_50_common::Move move_srv;
         move_srv.request.width = std::abs(goal_.position * 1000 * 2);  // from m to mm
