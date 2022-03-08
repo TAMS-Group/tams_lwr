@@ -253,7 +253,7 @@ public:
         {
             if (std::abs(cmd[i] - prev[i]) > max_joint_step)
             {
-                ROS_ERROR_STREAM("step " << std::abs(cmd[i] - prev[i]) << "is larger than max_joint_step: "  << max_joint_step);
+                ROS_ERROR_STREAM("step for joint " << i << " is " << std::abs(cmd[i] - prev[i]) << "which is larger than max_joint_step: "  << max_joint_step);
                 return false;
             }
         }
