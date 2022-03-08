@@ -295,24 +295,18 @@ int main(int argc, char** argv)
     ROS_INFO("ros fri roscontrol");
 
     {
-        // robot interface for sending commands to the robot and receiving joint
-        // feedback
+        // robot interface for sending commands to the robot and receiving joint feedback
         LWR robot;
 
-        // usleep(5 * 1000 * 1000);
-
-        // ros controller manager for our robot, need to periodically call update on
-        // it
+        // ros controller manager for our robot, need to periodically call update on it
         controller_manager::ControllerManager cm(&robot);
 
-        // start robot
+        // start robot, needs to try twice until it starts
         if (!robot.start())
         {
             ROS_ERROR_STREAM("failed to start robot");
             return -1;
         }
-
-        // usleep(5 * 1000 * 1000);
 
         // async spinner running in the background
         ros::AsyncSpinner spinner(2);
@@ -341,7 +335,6 @@ int main(int argc, char** argv)
 
                 // update controller manager
                 cm.update(ros_time, elapsed_time);
-                // cm.update(ros_time, ros::Duration(1.0 / 1000));
 
                 // send commands to robot
                 if (!robot.write())
@@ -353,7 +346,6 @@ int main(int argc, char** argv)
 
             // sleep
             // TODO: update rate ?
-            // usleep(1000 * 1);
             robot.wait();
         }
 
