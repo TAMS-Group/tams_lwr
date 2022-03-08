@@ -108,11 +108,17 @@ public:
         // start robot and set error flag
         ROS_INFO("starting robot");
         {
-            auto result = fri->StartRobot(FastResearchInterface::JOINT_POSITION_CONTROL);
+            auto result = fri->StartRobot(FastResearchInterface::JOINT_POSITION_CONTROL, 5);
             if (result != EOK)
             {
-                ROS_ERROR_STREAM("failed to start robot error " << result);
-                return false;
+                ROS_WARN_STREAM("failed to start robot error " << result << " try again...");
+                // try again
+                auto result = fri->StartRobot(FastResearchInterface::JOINT_POSITION_CONTROL, 5);
+                if (result != EOK)
+                {
+                    ROS_ERROR_STREAM("failed to start robot error " << result << " stop robot...");
+                    return false;
+                }
             }
             else
             {
@@ -127,10 +133,12 @@ public:
         }
 
         ROS_INFO("fri mode %i", fri->GetFRIMode());
+        ROS_INFO("fri control mode %i", fri->GetCurrentControlScheme());
         ROS_INFO("power %i", fri->IsRobotArmPowerOn());
         ROS_INFO("any drive error %i", fri->DoesAnyDriveSignalAnError());
         ROS_INFO("any drive warning %i", fri->DoesAnyDriveSignalAWarning());
         ROS_INFO_STREAM("cycle time " << fri->GetFRICycleTime());
+        ROS_INFO_STREAM("current communication timing quality " << fri->GetCommunicationTimingQuality());
 
         for (auto& f : tmp)
         {
