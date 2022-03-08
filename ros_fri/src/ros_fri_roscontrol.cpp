@@ -66,7 +66,7 @@ public:
         ROS_INFO("creating fast research interface");
         fri.reset(new FastResearchInterface("/opt/FRILibrary/etc/980039-FRI-Driver.init"));
         ROS_INFO("fast research interface created");
-        print_fri_info();
+        printFriInfo();
 
         // init buffers
         cmd.resize(joint_names.size(), 0.0);
@@ -100,17 +100,15 @@ public:
     }
 
     // set control mode
-    bool set_control_mode()
+    bool setControlMode()
     {
-        auto result = fri->StartRobot(control_mode, 5);
-        if (result != EOK)
+        if (fri->StartRobot(control_mode, 5) != EOK)
         {
-            ROS_WARN_STREAM("failed to start robot error " << result << " try again...");
+            ROS_WARN_STREAM("failed to start robot error try again...");
             // try again
-            auto result = fri->StartRobot(control_mode, 5);
-            if (result != EOK)
+            if (fri->StartRobot(control_mode, 5) != EOK)
             {
-                ROS_ERROR_STREAM("failed to start robot error " << result << " stop robot...");
+                ROS_ERROR_STREAM("failed to start robot error stop robot...");
                 return false;
             }
         }
@@ -118,7 +116,7 @@ public:
         return true;
     }
 
-    bool print_fri_info()
+    void printFriInfo()
     {
         ROS_WARN("fri mode %i", fri->GetFRIMode());
         ROS_INFO("fri control mode %i", fri->GetCurrentControlScheme());
@@ -135,7 +133,7 @@ public:
     {
         // start robot and set error flag
         ROS_INFO("starting robot");
-        if (!set_control_mode())
+        if (!setControlMode())
         {
             ROS_ERROR_STREAM("set control mode failed");
             return false;
@@ -145,7 +143,7 @@ public:
             ROS_ERROR_STREAM("machine is not ok");
             return false;
         }
-        print_fri_info();
+        printFriInfo();
         for (auto& f : tmp)
         {
             f = 0.0;
@@ -291,7 +289,7 @@ public:
 int main(int argc, char** argv)
 {
     // init ros node
-    ros::init(argc, argv, "ros_fri_roscontrol" /*, ros::init_options::NoSigintHandler*/);
+    ros::init(argc, argv, "ros_fri_ros_control");
     ros::NodeHandle node_handle_in_main("~");
     ROS_INFO("ros fri ros control node started");
     {
