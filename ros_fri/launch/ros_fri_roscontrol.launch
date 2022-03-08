@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
   <param name="robot_description" command="$(find xacro)/xacro $(find tams_lwr_wsg50_description)/urdf/lwr_with_wsg50.xacro" />
+  <arg name="control_mode" default="10" />
   <rosparam>
     joint_state_controller:
       type: joint_state_controller/JointStateController
@@ -29,6 +30,7 @@
           - lwr_arm_6_joint
   </rosparam>
   <node name="ros_fri_roscontrol" pkg="ros_fri" type="ros_fri_roscontrol" respawn="false" output="screen" required="true">
+    <param name="control_mode" value="$(arg control_mode)" />
     <remap from="/joint_states" to="/lwr/joint_states" />
   </node>
   <node name="position_trajectory_controller" pkg="controller_manager" type="spawner" respawn="false" output="screen"

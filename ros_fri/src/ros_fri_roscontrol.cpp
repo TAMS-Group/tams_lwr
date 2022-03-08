@@ -56,19 +56,17 @@ class LWR : public hardware_interface::RobotHW
     ros::Time time_old_, time_new_;
     double Position_old_[LBR_MNJ], Position_new_[LBR_MNJ];
 public:
+    int control_mode;
     LWR()
     {
+        ros::NodeHandle node_handle("~");
+        node_handle.param("control_mode", control_mode, int(FastResearchInterface::JOINT_POSITION_CONTROL));
+
         // create robot interface
         ROS_INFO("creating fast research interface");
         fri.reset(new FastResearchInterface("/opt/FRILibrary/etc/980039-FRI-Driver.init"));
         ROS_INFO("fast research interface created");
-
-        // usleep(1000 * 1000);
-
-        ROS_INFO("fri mode %i", fri->GetFRIMode());
-        ROS_INFO("power %i", fri->IsRobotArmPowerOn());
-        ROS_INFO("any drive error %i", fri->DoesAnyDriveSignalAnError());
-        ROS_INFO("any drive warning %i", fri->DoesAnyDriveSignalAWarning());
+        print_fri_info();
 
         // init buffers
         cmd.resize(joint_names.size(), 0.0);
@@ -101,45 +99,53 @@ public:
         time_new_ = ros::Time::now();
     }
 
-    // start robot
-    // needs to be called before sending any commands to the robot
-    bool start()
+    // set control mode
+    bool set_control_mode()
     {
-        // start robot and set error flag
-        ROS_INFO("starting robot");
+        auto result = fri->StartRobot(control_mode, 5);
+        if (result != EOK)
         {
-            auto result = fri->StartRobot(FastResearchInterface::JOINT_POSITION_CONTROL, 5);
+            ROS_WARN_STREAM("failed to start robot error " << result << " try again...");
+            // try again
+            auto result = fri->StartRobot(control_mode, 5);
             if (result != EOK)
             {
-                ROS_WARN_STREAM("failed to start robot error " << result << " try again...");
-                // try again
-                auto result = fri->StartRobot(FastResearchInterface::JOINT_POSITION_CONTROL, 5);
-                if (result != EOK)
-                {
-                    ROS_ERROR_STREAM("failed to start robot error " << result << " stop robot...");
-                    return false;
-                }
-            }
-            else
-            {
-                ROS_INFO("robot started");
+                ROS_ERROR_STREAM("failed to start robot error " << result << " stop robot...");
+                return false;
             }
         }
-        // usleep(1000000);
-        if (!(fri->IsMachineOK()))
-        {
-            ROS_ERROR_STREAM("machine is not ok");
-            return false;
-        }
+        ROS_INFO_STREAM("robot started with the setting of " << control_mode << " mode");
+        return true;
+    }
 
-        ROS_INFO("fri mode %i", fri->GetFRIMode());
+    bool print_fri_info()
+    {
+        ROS_WARN("fri mode %i", fri->GetFRIMode());
         ROS_INFO("fri control mode %i", fri->GetCurrentControlScheme());
         ROS_INFO("power %i", fri->IsRobotArmPowerOn());
         ROS_INFO("any drive error %i", fri->DoesAnyDriveSignalAnError());
         ROS_INFO("any drive warning %i", fri->DoesAnyDriveSignalAWarning());
         ROS_INFO_STREAM("cycle time " << fri->GetFRICycleTime());
         ROS_INFO_STREAM("current communication timing quality " << fri->GetCommunicationTimingQuality());
+    }
 
+    // start robot
+    // needs to be called before sending any commands to the robot
+    bool start()
+    {
+        // start robot and set error flag
+        ROS_INFO("starting robot");
+        if (!set_control_mode())
+        {
+            ROS_ERROR_STREAM("set control mode failed");
+            return false;
+        }
+        if (!(fri->IsMachineOK()))
+        {
+            ROS_ERROR_STREAM("machine is not ok");
+            return false;
+        }
+        print_fri_info();
         for (auto& f : tmp)
         {
             f = 0.0;
@@ -286,14 +292,8 @@ int main(int argc, char** argv)
 {
     // init ros node
     ros::init(argc, argv, "ros_fri_roscontrol" /*, ros::init_options::NoSigintHandler*/);
-
-    ros::NodeHandle node_handle;
-
-    // ros::CallbackQueue queue;
-    // node_handle.setCallbackQueue(&queue);
-
-    ROS_INFO("ros fri roscontrol");
-
+    ros::NodeHandle node_handle_in_main("~");
+    ROS_INFO("ros fri ros control node started");
     {
         // robot interface for sending commands to the robot and receiving joint feedback
         LWR robot;
