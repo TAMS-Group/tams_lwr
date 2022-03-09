@@ -51,7 +51,7 @@ class LWR : public hardware_interface::RobotHW
     ros::Time time_old_, time_new_;
     double Position_old_[NUMBER_OF_JOINTS], Position_new_[NUMBER_OF_JOINTS];
     float CommandedTorquesInNm[NUMBER_OF_JOINTS], CommandedStiffness[NUMBER_OF_JOINTS],
-        CommandedDamping[NUMBER_OF_JOINTS], MeasuredTorquesInNm[NUMBER_OF_JOINTS], JointValuesInRad[NUMBER_OF_JOINTS];
+        CommandedDamping[NUMBER_OF_JOINTS];
 
 public:
     int control_mode;
@@ -94,6 +94,19 @@ public:
         registerInterface(&joint_state_interface);
         registerInterface(&joint_position_interface);
         registerInterface(&force_torque_interface);
+
+        // set the initial joint stiffness
+        for (int i = 0; i < NUMBER_OF_JOINTS; i++)
+        {
+            CommandedStiffness[i] = (float)100.0;
+            CommandedDamping[i] = (float)0.7;
+            CommandedTorquesInNm[i] = (float)0.0;
+        }
+
+        fri->SetCommandedJointStiffness(CommandedStiffness);
+        fri->SetCommandedJointDamping(CommandedDamping);
+        fri->SetCommandedJointTorques(CommandedTorquesInNm);
+
         time_new_ = ros::Time::now();
     }
 
@@ -264,6 +277,9 @@ public:
         }
 
         fri->SetCommandedJointPositions(tmp.data());
+        fri->SetCommandedJointStiffness(CommandedStiffness);
+        fri->SetCommandedJointDamping(CommandedDamping);
+        fri->SetCommandedJointTorques(CommandedTorquesInNm);
         prev.assign(cmd.begin(), cmd.end());
         return true;
     }

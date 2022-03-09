@@ -28,9 +28,9 @@ class TeachMode:
         diff_max = 2.0
         diff_threshold = 0.005
         v_threshold = 0.0
-        torque_speed = 0.05
+        torque_speed = 0.15
         diff_speed = 0.0
-        torque_gains = np.array([0.8, 0.2, 1, 1, 5, 5, 10])
+        torque_gains = np.array([0.8, 0.5, 1, 1, 5, 5, 10])
         msg = None
         while not rospy.is_shutdown():
             self.rrate.sleep()
