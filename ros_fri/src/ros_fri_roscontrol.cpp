@@ -35,22 +35,14 @@ class LWR : public hardware_interface::RobotHW
 
     // maximum joint-space difference between two robot commands
     double max_step_size = 0.0004;
-
-    std::vector<double> lower_joint_limits = {
-        -2.90, -2.00, -2.90, -2.00, -2.90, -2.00, -2.90,
-    };
-    std::vector<double> upper_joint_limits = {
-        +2.90, +2.00, +2.90, +2.00, +2.90, +2.00, +2.90,
-    };
-
-    std::vector<double> joint_diff_weights = {
-        1, 1, 1, 1, 0.4, 0.4, 0.25,
-    };
+    std::vector<double> lower_joint_limits = {-2.90, -2.00, -2.90, -2.00, -2.90, -2.00, -2.90};
+    std::vector<double> upper_joint_limits = {+2.90, +2.00, +2.90, +2.00, +2.90, +2.00, +2.90};
+    std::vector<double> joint_diff_weights = {1, 1, 1, 1, 0.4, 0.4, 0.25};
 
     // force/torque interface for the end-effector
     hardware_interface::ForceTorqueSensorInterface force_torque_interface;
-    std::vector<double> force{ 3, 0.0 }, torque{ 3, 0.0 };
-    std::vector<float> tmp_force_torque{ 6, 0.0 };
+    std::vector<double> force{3, 0.0}, torque{3, 0.0};
+    std::vector<float> tmp_force_torque{6, 0.0};
 
     double max_joint_step = 1.0 / 100;
     ros::Time time_old_, time_new_;
@@ -119,7 +111,7 @@ public:
     void printFriInfo()
     {
         ROS_WARN("fri mode %i", fri->GetFRIMode());
-        ROS_INFO("fri control mode %i", fri->GetCurrentControlScheme());
+        ROS_WARN("fri control mode %i", fri->GetCurrentControlScheme());
         ROS_INFO("power %i", fri->IsRobotArmPowerOn());
         ROS_INFO("any drive error %i", fri->DoesAnyDriveSignalAnError());
         ROS_INFO("any drive warning %i", fri->DoesAnyDriveSignalAWarning());
@@ -166,10 +158,10 @@ public:
     void stop()
     {
         // stop robot
-        ROS_INFO("stopping robot");
+        ROS_WARN("stopping robot");
         puts("stopping robot");
         fri->StopRobot();
-        ROS_INFO("robot stopped");
+        ROS_WARN("robot stopped");
         puts("robot stopped");
     }
 
@@ -177,9 +169,6 @@ public:
     {
         stop();
     }
-
-    // checks if everything is ok with the robot or if we should shut down
-    // bool ok() { return robot_ok; }
 
     bool wait()
     {
