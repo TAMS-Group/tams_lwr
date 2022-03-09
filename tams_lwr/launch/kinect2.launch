@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="kinect2_number" default="no_2"/>
+    <arg name="output" default="log"/>
+    <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
+        <arg name="publish_tf" value="true"/>
+        <arg name="output" value="$(arg output)"/>
+        <arg name="calib_path" value="$(find tams_camera_config)/kinect2/$(arg kinect2_number)/" />
+    </include>
+
+    <!-- start apriltag code -->
+    <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_ros_continuous_node" clear_params="true" >
+        <!-- Remap topics from those used in code to those on the ROS network -->
+        <remap from="image_rect" to="/kinect2/qhd/image_color_rect" />
+        <remap from="camera_info" to="/kinect2/qhd/camera_info" />
+
+        <param name="camera_frame" type="str" value="camera" />
+        <param name="publish_tag_detections_image" type="bool" value="false" />      <!-- default: false -->
+
+        <rosparam command="load" file="$(find tams_lwr)/config/apriltag/settings.yaml"/>
+        <rosparam command="load" file="$(find tams_lwr)/config/apriltag/tags.yaml"/>
+    </node>
+
+    <!-- get camera to world transform -->
+    <node pkg="camera_positioner" type="camera_positioner" name="camera_positioner">
+        <rosparam param="bundle_tags">[39]</rosparam>
+        <param name="camera_rgb_optical_frame" value="kinect2_rgb_optical_frame"/>
+        <param name="camera_link" value="kinect2_link"/>
+        <param name="shared_frame" value="apriltag_table"/>
+        <param name="world_frame" value="world"/>
+        <param name="static_camera" value="true"/>
+    </node>
+</launch>

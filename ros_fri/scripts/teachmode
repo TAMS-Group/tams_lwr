@@ -18,7 +18,6 @@ class TeachMode:
                          self.controller_state_callback)
         rospy.Subscriber("/lwr/joint_states", sensor_msgs.msg.JointState, self.joint_state_callback)
         self.publisher = rospy.Publisher("lwr/command", trajectory_msgs.msg.JointTrajectory, queue_size=10)
-        self.max_joint_diff = np.zeros(7)
         self.run_teach_mode()
 
     def run_teach_mode(self):
