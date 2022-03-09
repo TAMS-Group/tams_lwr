@@ -13,6 +13,9 @@
 #include <FastResearchInterface.h>
 #include <LinuxAbstraction.h>
 #include <ros/callback_queue.h>
+#ifndef NUMBER_OF_JOINTS
+#define NUMBER_OF_JOINTS LBR_MNJ
+#endif
 
 class LWR : public hardware_interface::RobotHW
 {
@@ -35,18 +38,21 @@ class LWR : public hardware_interface::RobotHW
 
     // maximum joint-space difference between two robot commands
     double max_step_size = 0.0004;
-    std::vector<double> lower_joint_limits = {-2.90, -2.00, -2.90, -2.00, -2.90, -2.00, -2.90};
-    std::vector<double> upper_joint_limits = {+2.90, +2.00, +2.90, +2.00, +2.90, +2.00, +2.90};
-    std::vector<double> joint_diff_weights = {1, 1, 1, 1, 0.4, 0.4, 0.25};
+    std::vector<double> lower_joint_limits = { -2.90, -2.00, -2.90, -2.00, -2.90, -2.00, -2.90 };
+    std::vector<double> upper_joint_limits = { +2.90, +2.00, +2.90, +2.00, +2.90, +2.00, +2.90 };
+    std::vector<double> joint_diff_weights = { 1, 1, 1, 1, 0.4, 0.4, 0.25 };
 
     // force/torque interface for the end-effector
     hardware_interface::ForceTorqueSensorInterface force_torque_interface;
-    std::vector<double> force{3, 0.0}, torque{3, 0.0};
-    std::vector<float> tmp_force_torque{6, 0.0};
+    std::vector<double> force{ 3, 0.0 }, torque{ 3, 0.0 };
+    std::vector<float> tmp_force_torque{ 6, 0.0 };
 
     double max_joint_step = 1.0 / 100;
     ros::Time time_old_, time_new_;
-    double Position_old_[LBR_MNJ], Position_new_[LBR_MNJ];
+    double Position_old_[NUMBER_OF_JOINTS], Position_new_[NUMBER_OF_JOINTS];
+    float CommandedTorquesInNm[NUMBER_OF_JOINTS], CommandedStiffness[NUMBER_OF_JOINTS],
+        CommandedDamping[NUMBER_OF_JOINTS], MeasuredTorquesInNm[NUMBER_OF_JOINTS], JointValuesInRad[NUMBER_OF_JOINTS];
+
 public:
     int control_mode;
     LWR()
@@ -200,7 +206,7 @@ public:
         // calculate velocities
         time_old_ = time_new_;
         time_new_ = ros::Time::now();
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             Position_old_[j] = Position_new_[j];
             Position_new_[j] = pos[j];
@@ -241,7 +247,8 @@ public:
         {
             if (std::abs(cmd[i] - prev[i]) > max_joint_step)
             {
-                ROS_ERROR_STREAM("step for joint " << i << " is " << std::abs(cmd[i] - prev[i]) << "which is larger than max_joint_step: "  << max_joint_step);
+                ROS_ERROR_STREAM("step for joint " << i << " is " << std::abs(cmd[i] - prev[i])
+                                                   << "which is larger than max_joint_step: " << max_joint_step);
                 return false;
             }
         }
@@ -265,7 +272,7 @@ public:
 int main(int argc, char** argv)
 {
     // init ros node
-    ros::init(argc, argv, "ros_fri_ros_control");
+    ros::init(argc, argv, "ros_fri_roscontrol");
     ros::NodeHandle node_handle_in_main("~");
     ROS_INFO("ros fri ros control node started");
     {
@@ -299,8 +306,7 @@ int main(int argc, char** argv)
                 ROS_ERROR_STREAM("failed to read lwr robot state");
                 break;
             }
-
-            if (read_ok)
+            else
             {
                 // get ros time
                 ros::Time ros_time = ros::Time::now();
