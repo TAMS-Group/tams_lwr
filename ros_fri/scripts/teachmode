@@ -22,7 +22,7 @@ class TeachMode:
         self.run_teach_mode()
 
     def run_teach_mode(self):
-        dtime = 0.015
+        dtime = 0.01
         torque_max = 20.0
         torque_threshold = 1.0
         diff_max = 2.0
@@ -30,7 +30,7 @@ class TeachMode:
         v_threshold = 0.0
         torque_speed = 0.15
         diff_speed = 0.0
-        torque_gains = np.array([0.8, 0.5, 1, 1, 5, 5, 10])
+        torque_gains = np.array([1, 0.5, 1, 2, 8, 8, 10])
         msg = None
         while not rospy.is_shutdown():
             self.rrate.sleep()
@@ -63,12 +63,9 @@ class TeachMode:
                               * np.sign(torques[i]) * torque_gains[i])
             velocities = torques * torque_speed + diffs * diff_speed
             velocities = np.maximum(velocities * 0.0, np.abs(velocities) - v_threshold) * np.sign(velocities)
-            self.command_positions = np.array(msg.points[-1].positions) - velocities * 1.0 / self.fps
+            position_diff = np.clip(velocities / self.fps, -0.02, 0.02)
+            self.command_positions = np.array(msg.points[-1].positions) - position_diff
             msg.points[-1].positions = list(self.command_positions)
-            # joint_diff = np.abs(self.command_positions-self.joint_positions)
-            # ind = np.where(joint_diff > self.max_joint_diff)[0]
-            # self.max_joint_diff[ind] = joint_diff[ind]
-            # rospy.loginfo("distance to current position {}".format(self.max_joint_diff))
             self.publisher.publish(msg)
 
     def controller_state_callback(self, msg):
