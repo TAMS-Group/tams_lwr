@@ -239,19 +239,6 @@ public:
             return false;
         }
 
-        bool cmd_all_zero = true;
-        for (auto& f : cmd)
-        {
-            if (f != 0.0)
-            {
-                cmd_all_zero = false;
-            }
-        }
-        if (cmd_all_zero)
-        {
-            ROS_ERROR_STREAM("all command positions are zero");
-            return false;
-        }
         for (auto& f : cmd)
         {
             if (!std::isfinite(f))
