@@ -2,6 +2,11 @@
 <launch>
   <param name="robot_description" command="$(find xacro)/xacro $(find tams_lwr_wsg50_description)/urdf/lwr_with_wsg50.xacro" />
   <arg name="control_mode" default="10" />
+  <!--  available control modes:-->
+  <!--  JOINT_POSITION_CONTROL  = 10 -->
+  <!--  CART_IMPEDANCE_CONTROL  = 20 -->
+  <!--  JOINT_IMPEDANCE_CONTROL = 30 -->
+  <!--  JOINT_TORQUE_CONTROL    = 90 -->
   <rosparam>
     joint_state_controller:
       type: joint_state_controller/JointStateController
