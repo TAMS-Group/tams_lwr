@@ -13,9 +13,6 @@
 #include <frilibrary/FastResearchInterface.h>
 #include <frilibrary/LinuxAbstraction.h>
 #include <ros/callback_queue.h>
-#ifndef NUMBER_OF_JOINTS
-#define NUMBER_OF_JOINTS LBR_MNJ
-#endif
 
 class LWR : public hardware_interface::RobotHW
 {

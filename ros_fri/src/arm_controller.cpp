@@ -93,7 +93,6 @@
 
 #define NUMBER_OF_FRAME_ELEMENTS 12
 #define NUMBER_OF_CART_DOFS 6
-#define LBR_MNJ 7           /*!< Number of Managed Joints for Light Weight Robot */
 
 // static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutex;
@@ -128,22 +127,22 @@ protected:
     unsigned int cycles;
     bool shutdown_flag;
 
-    double Position_old_[LBR_MNJ], Position_new_[LBR_MNJ];
+    double Position_old_[NUMBER_OF_JOINTS], Position_new_[NUMBER_OF_JOINTS];
     ros::Time time_old_, time_new_, time_delta_;
-    double velocity_new_[LBR_MNJ], velocity_old_[LBR_MNJ];
-    double acceleration_[LBR_MNJ];
+    double velocity_new_[NUMBER_OF_JOINTS], velocity_old_[NUMBER_OF_JOINTS];
+    double acceleration_[NUMBER_OF_JOINTS];
 
     bool setCancelOnForceAtTCP_;
 
-    float commandedJointPositions_[LBR_MNJ];
-    float measuredJointPositions_[LBR_MNJ];
-    float commandedJointPositionOffsets_[LBR_MNJ];
-    float measuredJointTorques_[LBR_MNJ];
-    float estimatedExternalJointTorques_[LBR_MNJ];
-    float commandedTorquesInNm_[LBR_MNJ];
-    float commandedJointStiffness_[LBR_MNJ];
-    float commandedJointDamping_[LBR_MNJ];
-    float driveTemperatues_[LBR_MNJ];
+    float commandedJointPositions_[NUMBER_OF_JOINTS];
+    float measuredJointPositions_[NUMBER_OF_JOINTS];
+    float commandedJointPositionOffsets_[NUMBER_OF_JOINTS];
+    float measuredJointTorques_[NUMBER_OF_JOINTS];
+    float estimatedExternalJointTorques_[NUMBER_OF_JOINTS];
+    float commandedTorquesInNm_[NUMBER_OF_JOINTS];
+    float commandedJointStiffness_[NUMBER_OF_JOINTS];
+    float commandedJointDamping_[NUMBER_OF_JOINTS];
+    float driveTemperatues_[NUMBER_OF_JOINTS];
 
     float commandedWrench[NUMBER_OF_CART_DOFS];
     float commandedCartStiffness_[NUMBER_OF_CART_DOFS];
@@ -248,12 +247,12 @@ public:
         cycles = 0;
         shutdown_flag = false;
 
-        memset(commandedJointPositions_, 0x0, LBR_MNJ * sizeof(float));
-        memset(commandedJointPositionOffsets_, 0x0, LBR_MNJ * sizeof(float));
-        memset(measuredJointPositions_, 0x0, LBR_MNJ * sizeof(float));
-        memset(measuredJointTorques_, 0x0, LBR_MNJ * sizeof(float));
-        memset(estimatedExternalJointTorques_, 0x0, LBR_MNJ * sizeof(float));
-        memset(driveTemperatues_, 0x0, LBR_MNJ * sizeof(float));
+        memset(commandedJointPositions_, 0x0, NUMBER_OF_JOINTS * sizeof(float));
+        memset(commandedJointPositionOffsets_, 0x0, NUMBER_OF_JOINTS * sizeof(float));
+        memset(measuredJointPositions_, 0x0, NUMBER_OF_JOINTS * sizeof(float));
+        memset(measuredJointTorques_, 0x0, NUMBER_OF_JOINTS * sizeof(float));
+        memset(estimatedExternalJointTorques_, 0x0, NUMBER_OF_JOINTS * sizeof(float));
+        memset(driveTemperatues_, 0x0, NUMBER_OF_JOINTS * sizeof(float));
 
         memset(commandedWrench, 0x0, NUMBER_OF_CART_DOFS * sizeof(float));
         memset(commandedCartStiffness_, 0x0, NUMBER_OF_CART_DOFS * sizeof(float));
@@ -293,7 +292,7 @@ public:
         if (debuglevel > 0)
         {
             ROS_INFO("ros_fri: kinematics limits configured as follows:");
-            for (int j = 0; j < LBR_MNJ; j++)
+            for (int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 ROS_INFO("joint %d name '%s' lower %10.4lf upper %10.4lf  max_vel %10.4lf max_acc %10.4lf max_torque "
                          "%10.4lf",
@@ -418,14 +417,14 @@ public:
         // init position and timers for velocity
         //
         FRI->GetMeasuredJointPositions(measuredJointPositions_);
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             Position_old_[j] = measuredJointPositions_[j];
         }
         time_old_ = ros::Time::now();
         FRI->WaitForKRCTick();
         FRI->GetMeasuredJointPositions(measuredJointPositions_);
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             Position_new_[j] = measuredJointPositions_[j];
         }
@@ -436,19 +435,19 @@ public:
         // ReflexxesAPI
         //
         CycleTime_ = 0.01;
-        RML_ = new ReflexxesAPI(LBR_MNJ, CycleTime_);
-        VIP_ = new RMLVelocityInputParameters(LBR_MNJ);
-        VOP_ = new RMLVelocityOutputParameters(LBR_MNJ);
+        RML_ = new ReflexxesAPI(NUMBER_OF_JOINTS, CycleTime_);
+        VIP_ = new RMLVelocityInputParameters(NUMBER_OF_JOINTS);
+        VOP_ = new RMLVelocityOutputParameters(NUMBER_OF_JOINTS);
         VOP_initialized = false;
 
-        PIP_ = new RMLPositionInputParameters(LBR_MNJ);
-        POP_ = new RMLPositionOutputParameters(LBR_MNJ);
+        PIP_ = new RMLPositionInputParameters(NUMBER_OF_JOINTS);
+        POP_ = new RMLPositionOutputParameters(NUMBER_OF_JOINTS);
         POP_initialized = false;
 
         // joint impedance mode
         //
         ROS_ERROR("before joint impedance mode...");
-        for (unsigned int i = 0; i < LBR_MNJ; i++)
+        for (unsigned int i = 0; i < NUMBER_OF_JOINTS; i++)
         {
             commandedJointStiffness_[i] = (float)200.0;
             commandedJointDamping_[i] = (float)0.7;
@@ -496,13 +495,13 @@ public:
     {
         double a, b, c, d, e, f, g;
         int n = sscanf(tokens.c_str(), "%lf %lf %lf %lf %lf %lf %lf", &a, &b, &c, &d, &e, &f, &g);
-        if (n != LBR_MNJ)
+        if (n != NUMBER_OF_JOINTS)
         {
             ROS_ERROR("ros_fri: Failed to parse initialization data '%s', found %d tokens.", tokens.c_str(), n);
             exit(1);
         }
 
-        data.resize(LBR_MNJ);
+        data.resize(NUMBER_OF_JOINTS);
         data[0] = a;
         data[1] = b;
         data[2] = c;
@@ -570,7 +569,7 @@ public:
                     exit(EXIT_FAILURE);
                 }
 
-                for (unsigned int j = 0; j < LBR_MNJ; j++)
+                for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
                 {
                     commandedJointPositions_[j] = g->trajectory.points[i].positions[j];
                 }
@@ -600,7 +599,7 @@ public:
                 // check measured and commanded JointValues and stop motion if necessary
                 if (i > 0)
                 {
-                  for (unsigned int j = 0; j < LBR_MNJ; j++)
+                  for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
                   {
                   //  ROS_INFO("Don't touch me )) -- %f", fabs(commandedJointPositions_[j] -
                 measuredJointPositions_[j])); if (fabs(commandedJointPositions_[j] - measuredJointPositions_[j]) > 0.02)
@@ -668,7 +667,7 @@ public:
                     exit(EXIT_FAILURE);
                 }
 
-                for (unsigned int j = 0; j < LBR_MNJ; j++)
+                for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
                 {
                     commandedJointPositions_[j] = g->trajectory.points[i].positions[j];
                 }
@@ -742,7 +741,7 @@ public:
 
                 ROS_INFO("Time1 %i . %i \n", ros::Time::now().sec, ros::Time::now().nsec);
 
-                for (int j = 0; j < LBR_MNJ; j++)
+                for (int j = 0; j < NUMBER_OF_JOINTS; j++)
                 {
                     joint_values.name.push_back(names[j]);
                     joint_values.position.push_back(g->trajectory.points[i].positions[j]);
@@ -868,7 +867,7 @@ public:
         // load current position
         //
         FRI->GetMeasuredJointPositions(measuredJointPositions_);
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             VIP_->CurrentPositionVector->VecData[j] = measuredJointPositions_[j];
             VIP_->CurrentVelocityVector->VecData[j] = velocity_new_[j];
@@ -893,7 +892,7 @@ public:
                 break;
             }
 
-            for (unsigned int j = 0; j < LBR_MNJ; j++)
+            for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 commandedJointPositions_[j] = VOP_->NewPositionVector->VecData[j];
             }
@@ -917,7 +916,7 @@ public:
     {
         FRI->GetMeasuredJointPositions(measuredJointPositions_);
         FRI->GetMeasuredJointTorques(commandedTorquesInNm_);
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             acceleration_[j] = (velocity_new_[j] - velocity_old_[j]) / (time_new_.toSec() - time_old_.toSec());
         }
@@ -925,7 +924,7 @@ public:
         trajectory_msgs::JointTrajectoryPoint actual;
         trajectory_msgs::JointTrajectoryPoint desired;
         trajectory_msgs::JointTrajectoryPoint error;
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             actual.positions.push_back((double)measuredJointPositions_[j]);
             desired.positions.push_back(g->trajectory.points[counter].positions[j]);
@@ -975,7 +974,7 @@ public:
         time_old_ = time_new_;
         time_new_ = ros::Time::now();
 
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             Position_old_[j] = Position_new_[j];
             Position_new_[j] = measuredJointPositions_[j];
@@ -988,7 +987,7 @@ public:
         js.header.stamp = ros::Time::now();
         js.header.frame_id = "lwr_arm_base_link";
 
-        for (int j = 0; j < LBR_MNJ; j++)
+        for (int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             // ROS_INFO("names %f value \n",JointValuesInRad_[j]);
             js.name.push_back(jointNames[j]);
@@ -1005,7 +1004,7 @@ public:
         // now re-send the message with estimatedExternalTorques
         //
         FRI->GetEstimatedExternalJointTorques(estimatedExternalJointTorques_);
-        for (int j = 0; j < LBR_MNJ; j++)
+        for (int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             js.effort[j] = estimatedExternalJointTorques_[j];
         }
@@ -1029,7 +1028,7 @@ public:
     commandedJointPositionOffsets, measuredJointTorques, estimatedExternalJointTorques,
     estimatedExternalCartForcesAndTorques;
 
-      for (unsigned int j = 0; j < LBR_MNJ; j++)
+      for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
       {
         driveTemperatues.data.push_back(driveTemperatues_[j]);
         measuredJointPositions.data.push_back(measuredJointPositions_[j]);
@@ -1077,19 +1076,19 @@ public:
     {
         ros_fri_msgs::fri_status msg;
 
-        msg.driveTemperatures.resize(LBR_MNJ);
-        msg.measuredJointPositions.resize(LBR_MNJ);
-        msg.measuredJointTorques.resize(LBR_MNJ);
-        msg.estimatedExternalJointTorques.resize(LBR_MNJ);
-        msg.estimatedJointVelocities.resize(LBR_MNJ);
-        msg.estimatedJointPositionErrors.resize(LBR_MNJ);
-        msg.estimatedJointVelocityErrors.resize(LBR_MNJ);
+        msg.driveTemperatures.resize(NUMBER_OF_JOINTS);
+        msg.measuredJointPositions.resize(NUMBER_OF_JOINTS);
+        msg.measuredJointTorques.resize(NUMBER_OF_JOINTS);
+        msg.estimatedExternalJointTorques.resize(NUMBER_OF_JOINTS);
+        msg.estimatedJointVelocities.resize(NUMBER_OF_JOINTS);
+        msg.estimatedJointPositionErrors.resize(NUMBER_OF_JOINTS);
+        msg.estimatedJointVelocityErrors.resize(NUMBER_OF_JOINTS);
 
-        msg.commandedJointPositions.resize(LBR_MNJ);
-        msg.commandedJointPositionOffsets.resize(LBR_MNJ);
-        msg.commandedJointTorques.resize(LBR_MNJ);
-        msg.commandedJointStiffness.resize(LBR_MNJ);
-        msg.commandedJointDamping.resize(LBR_MNJ);
+        msg.commandedJointPositions.resize(NUMBER_OF_JOINTS);
+        msg.commandedJointPositionOffsets.resize(NUMBER_OF_JOINTS);
+        msg.commandedJointTorques.resize(NUMBER_OF_JOINTS);
+        msg.commandedJointStiffness.resize(NUMBER_OF_JOINTS);
+        msg.commandedJointDamping.resize(NUMBER_OF_JOINTS);
 
         msg.header.stamp = ros::Time::now();
         msg.header.frame_id = "lwr_arm_base_link";
@@ -1119,7 +1118,7 @@ public:
         std_msgs::Float32MultiArray DriveTemperatues;
         std_msgs::Float32MultiArray EstimatedExternalJointTorquesInNm;
 
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             DriveTemperatues.data.push_back(driveTemperatues_[j]);
             EstimatedExternalJointTorquesInNm.data.push_back(estimatedExternalWrench[j]);
@@ -1279,7 +1278,7 @@ public:
         if ((currentControlScheme_ == FastResearchInterface::JOINT_POSITION_CONTROL) or
             (currentControlScheme_ == FastResearchInterface::JOINT_IMPEDANCE_CONTROL))
         {
-            for (int i = 0; i < LBR_MNJ; i++)
+            for (int i = 0; i < NUMBER_OF_JOINTS; i++)
             {
                 commandedJointPositions_[i] = msg->data[i];
             }
@@ -1292,7 +1291,7 @@ public:
     {
         if (currentControlScheme_ == FastResearchInterface::JOINT_IMPEDANCE_CONTROL)
         {
-            for (int i = 0; i < LBR_MNJ; i++)
+            for (int i = 0; i < NUMBER_OF_JOINTS; i++)
             {
                 commandedJointDamping_[i] = msg->data[i];
             }
@@ -1305,7 +1304,7 @@ public:
         ROS_INFO("setJointStiffness");
         if (currentControlScheme_ == FastResearchInterface::JOINT_IMPEDANCE_CONTROL)
         {
-            for (int i = 0; i < LBR_MNJ; i++)
+            for (int i = 0; i < NUMBER_OF_JOINTS; i++)
             {
                 commandedJointStiffness_[i] = msg->data[i];
             }
@@ -1320,7 +1319,7 @@ public:
         if ((currentControlScheme_ == FastResearchInterface::JOINT_IMPEDANCE_CONTROL) or
             (currentControlScheme_ == FastResearchInterface::JOINT_TORQUE_CONTROL))
         {
-            for (int i = 0; i < LBR_MNJ; i++)
+            for (int i = 0; i < NUMBER_OF_JOINTS; i++)
             {
                 commandedTorquesInNm_[i] = msg->data[i];
             }
@@ -1332,7 +1331,7 @@ public:
     {
         if (currentControlScheme_ == FastResearchInterface::CART_IMPEDANCE_CONTROL)
         {
-            for (int i = 0; i < LBR_MNJ; i++)
+            for (int i = 0; i < NUMBER_OF_JOINTS; i++)
             {
                 commandedCartPose_[i] = msg->data[i];
             }
@@ -1405,18 +1404,18 @@ public:
             ROS_ERROR("setJntPosGoal t=%lf", msgPOP_timestamp.toSec());
 
         // ensure that the data structures are allocated
-        if (msgPOP_.TargetPositionVector.size() != LBR_MNJ)
-            msgPOP_.TargetPositionVector.resize(LBR_MNJ);
-        if (msgPOP_.TargetVelocityVector.size() != LBR_MNJ)
-            msgPOP_.TargetVelocityVector.resize(LBR_MNJ);
-        if (msgPOP_.MaxAccelerationVector.size() != LBR_MNJ)
-            msgPOP_.MaxAccelerationVector.resize(LBR_MNJ);
-        if (msgPOP_.MaxVelocityVector.size() != LBR_MNJ)
-            msgPOP_.MaxVelocityVector.resize(LBR_MNJ);
+        if (msgPOP_.TargetPositionVector.size() != NUMBER_OF_JOINTS)
+            msgPOP_.TargetPositionVector.resize(NUMBER_OF_JOINTS);
+        if (msgPOP_.TargetVelocityVector.size() != NUMBER_OF_JOINTS)
+            msgPOP_.TargetVelocityVector.resize(NUMBER_OF_JOINTS);
+        if (msgPOP_.MaxAccelerationVector.size() != NUMBER_OF_JOINTS)
+            msgPOP_.MaxAccelerationVector.resize(NUMBER_OF_JOINTS);
+        if (msgPOP_.MaxVelocityVector.size() != NUMBER_OF_JOINTS)
+            msgPOP_.MaxVelocityVector.resize(NUMBER_OF_JOINTS);
 
         pthread_mutex_lock(&mutex);
 
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             double x = msg->TargetPositionVector[j];
             double xx = clamp(x, lowerJointLimits[j], upperJointLimits[j]);
@@ -1475,7 +1474,7 @@ public:
             ROS_INFO("RML PIP/POP data...");
 
             pthread_mutex_lock(&mutex);
-            for (unsigned int j = 0; j < LBR_MNJ; j++)
+            for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 PIP_->CurrentPositionVector->VecData[j] = POP_->NewPositionVector->VecData[j];
                 PIP_->CurrentVelocityVector->VecData[j] = POP_->NewVelocityVector->VecData[j];
@@ -1500,7 +1499,7 @@ public:
             FRI->GetMeasuredJointPositions(measuredJointPositions_);
 
             pthread_mutex_lock(&mutex);
-            for (unsigned int j = 0; j < LBR_MNJ; j++)
+            for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 PIP_->CurrentPositionVector->VecData[j] = measuredJointPositions_[j];
                 PIP_->CurrentVelocityVector->VecData[j] = velocity_new_[j];
@@ -1562,7 +1561,7 @@ public:
             }
 
             ROS_INFO("joint target  pos meas-pos diff-pos   vel meas-vel diff-vel");
-            for (unsigned int j = 0; j < LBR_MNJ; j++)
+            for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 ROS_INFO("%d %8.3lf %8.3lf %8.3lf %10.5lf   %8.3lf %8.3lf %10.5lf  %8.3lf", j,
                          PIP_->TargetPositionVector->VecData[j], POP_->NewPositionVector->VecData[j],
@@ -1580,7 +1579,7 @@ public:
 
             // command robot
             pthread_mutex_lock(&mutex);
-            for (unsigned int j = 0; j < LBR_MNJ; j++)
+            for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 commandedJointPositions_[j] = POP_->NewPositionVector->VecData[j];
             }
@@ -1613,12 +1612,12 @@ public:
         if (debuglevel > 2)
             ROS_ERROR("setJntVelGoal t=%lf", msgVOP_timestamp.toSec());
 
-        if (msgVOP_.TargetVelocityVector.size() != LBR_MNJ)
-            msgVOP_.TargetVelocityVector.resize(LBR_MNJ);
-        if (msgVOP_.MaxAccelerationVector.size() != LBR_MNJ)
-            msgVOP_.MaxAccelerationVector.resize(LBR_MNJ);
+        if (msgVOP_.TargetVelocityVector.size() != NUMBER_OF_JOINTS)
+            msgVOP_.TargetVelocityVector.resize(NUMBER_OF_JOINTS);
+        if (msgVOP_.MaxAccelerationVector.size() != NUMBER_OF_JOINTS)
+            msgVOP_.MaxAccelerationVector.resize(NUMBER_OF_JOINTS);
 
-        for (unsigned int j = 0; j < LBR_MNJ; j++)
+        for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
         {
             double v = msg->TargetVelocityVector[j];
             double vv = clamp(v, -jointVelocityLimits[j], jointVelocityLimits[j]);
@@ -1652,7 +1651,7 @@ public:
             ROS_INFO("RML VIP/VOP data...");
 
             pthread_mutex_lock(&mutex);
-            for (unsigned int j = 0; j < LBR_MNJ; j++)
+            for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 VIP_->CurrentPositionVector->VecData[j] = VOP_->NewPositionVector->VecData[j];
                 VIP_->CurrentVelocityVector->VecData[j] = VOP_->NewVelocityVector->VecData[j];
@@ -1675,7 +1674,7 @@ public:
             FRI->GetMeasuredJointPositions(measuredJointPositions_);
 
             pthread_mutex_lock(&mutex);
-            for (unsigned int j = 0; j < LBR_MNJ; j++)
+            for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 VIP_->CurrentPositionVector->VecData[j] = measuredJointPositions_[j];
                 VIP_->CurrentVelocityVector->VecData[j] = velocity_new_[j];
@@ -1739,7 +1738,7 @@ public:
                 break;
             }
 
-            for (unsigned int j = 0; j < LBR_MNJ; j++)
+            for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 ROS_INFO("%d %8.3lf %8.3lf %10.5lf   %8.3lf %8.3lf %10.5lf  %8.3lf", j,
                          VOP_->NewPositionVector->VecData[j], measuredJointPositions_[j],
@@ -1756,7 +1755,7 @@ public:
             VIP_->SetMinimumSynchronizationTime(0.05);  // FIXME: don't hardcode
 
             // actually command pos/vel calculated in this cycle to the robot
-            for (unsigned int j = 0; j < LBR_MNJ; j++)
+            for (unsigned int j = 0; j < NUMBER_OF_JOINTS; j++)
             {
                 double v = VOP_->NewVelocityVector->VecData[j];
                 double x = VOP_->NewPositionVector->VecData[j];
