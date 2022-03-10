@@ -10,8 +10,8 @@
 #include <ros/node_handle.h>
 #include <RMLPositionInputParameters.h>
 #include <RMLPositionOutputParameters.h>
-#include <FastResearchInterface.h>
-#include <LinuxAbstraction.h>
+#include <frilibrary/FastResearchInterface.h>
+#include <frilibrary/LinuxAbstraction.h>
 #include <ros/callback_queue.h>
 #ifndef NUMBER_OF_JOINTS
 #define NUMBER_OF_JOINTS LBR_MNJ

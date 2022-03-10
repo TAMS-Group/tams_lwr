@@ -59,8 +59,8 @@
 #include <RMLVelocityInputParameters.h>
 #include <RMLVelocityOutputParameters.h>
 
-#include <FastResearchInterface.h>
-#include <LinuxAbstraction.h>
+#include <frilibrary/FastResearchInterface.h>
+#include <frilibrary/LinuxAbstraction.h>
 
 #include <ros_fri_msgs/RMLVelocityInputParameters.h>
 #include <ros_fri_msgs/RMLPositionInputParameters.h>
@@ -93,6 +93,7 @@
 
 #define NUMBER_OF_FRAME_ELEMENTS 12
 #define NUMBER_OF_CART_DOFS 6
+#define LBR_MNJ 7           /*!< Number of Managed Joints for Light Weight Robot */
 
 // static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutex;

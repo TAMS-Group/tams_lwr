@@ -45,21 +45,10 @@ add_dependencies(ros_fri ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ros_fri ${catkin_LIBRARIES} ${Boost_LIBRARIES}
         FastResearchInterfaceLibrary rt ReflexxesTypeII)
 
-# standalone tool to "reset" the arm to candle position
-add_executable(lwr_move_to_candle src/lwr_move_to_candle.cpp)
-add_dependencies(lwr_move_to_candle ${catkin_EXPORTED_TARGETS})
-target_link_libraries(lwr_move_to_candle FastResearchInterfaceLibrary rt ReflexxesTypeII
-        ${catkin_LIBRARIES} pthread)
-
 # endless loop demo for (small) joint-position motions via ros_fri
 add_executable(test_jnt_pos_goal src/test_jnt_pos_goal.cpp)
 add_dependencies(test_jnt_pos_goal ${catkin_EXPORTED_TARGETS})
 target_link_libraries(test_jnt_pos_goal ${catkin_LIBRARIES} pthread)
-
-# current position plus sinewave offset via ros_fri
-add_executable(lwr_sinewave src/lwr_sinewave.cpp)
-add_dependencies(lwr_sinewave ${catkin_EXPORTED_TARGETS})
-target_link_libraries(lwr_sinewave ${catkin_LIBRARIES} FastResearchInterfaceLibrary rt pthread)
 
 # generic joint-position motion via ros_fri
 add_executable(lwr_movej src/lwr_movej.cpp)
