@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   tf
   tf_conversions
-  tf2_bullet
   wsg_50_common
   joy
   moveit_msgs

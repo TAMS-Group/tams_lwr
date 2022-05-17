@@ -15,7 +15,6 @@ find_package(
         actionlib
         tf
         tf_conversions
-        tf2_bullet
         moveit_ros_planning
         controller_manager
         reflexxes_type2

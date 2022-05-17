@@ -25,7 +25,6 @@
   <build_depend>joy</build_depend>
   <build_depend>tf</build_depend>
   <build_depend>tf_conversions</build_depend>
-  <build_depend>tf2_bullet</build_depend>
   <build_depend>wsg_50_common</build_depend>
 
   <run_depend>roscpp</run_depend>
@@ -41,7 +40,6 @@
   <run_depend>joy</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>tf_conversions</run_depend>
-  <run_depend>tf2_bullet</run_depend>
   <run_depend>wsg_50_common</run_depend>
   <run_depend>tams_lwr_description</run_depend>
   <run_depend>tams_lwr_wsg50_description</run_depend>
