@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- start apriltag code -->
+    <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_ros_continuous_node" clear_params="true" >
+        <!-- Remap topics from those used in code to those on the ROS network -->
+        <remap from="image_rect" to="/rgb/image_raw" />
+        <remap from="camera_info" to="/rgb/camera_info/camera_info" />
+
+        <param name="camera_frame" type="str" value="rgb_camera_link" />
+        <param name="publish_tag_detections_image" type="bool" value="false" />      <!-- default: false -->
+
+        <rosparam command="load" file="$(find tams_lwr)/config/apriltag/settings.yaml"/>
+        <rosparam command="load" file="$(find tams_lwr)/config/apriltag/tags.yaml"/>
+    </node>
+
+    <!-- get camera to world transform -->
+    <node pkg="camera_positioner" type="camera_positioner" name="camera_positioner">
+        <rosparam param="bundle_tags">[39]</rosparam>
+        <param name="camera_rgb_optical_frame" value="rgb_camera_link"/>
+        <param name="camera_link" value="camera_base"/>
+        <param name="shared_frame" value="apriltag_table"/>
+        <param name="world_frame" value="world"/>
+        <param name="static_camera" value="false"/>
+    </node>
+</launch>
