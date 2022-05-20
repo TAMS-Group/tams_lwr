@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
 <launch>
+    <include file="$(find azure_kinect_ros_driver)/launch/driver.launch" >
+        <arg name="color_resolution" value="720"/>
+        <arg name="fps" value="5"/>
+    </include>
+
     <!-- start apriltag code -->
     <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_ros_continuous_node" clear_params="true" >
         <!-- Remap topics from those used in code to those on the ROS network -->
