@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <launch>
     <include file="$(find azure_kinect_ros_driver)/launch/driver.launch" >
-        <arg name="color_resolution" value="720p"/>
+        <arg name="color_resolution" value="720P"/>
         <arg name="fps" value="5"/>
+        <arg name="overwrite_robot_description" value="false"/>
     </include>
 
     <!-- start apriltag code -->
