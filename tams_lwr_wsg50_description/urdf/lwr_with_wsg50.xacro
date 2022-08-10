@@ -271,7 +271,13 @@
     <!-- <origin xyz="0.000091 -0.008086 0.15" rpy="0 0 ${-pi/2}" /> -->
     <origin xyz="0.000541 -0.007464 0.205" rpy="0 0 ${-pi/2}"/>
   </joint>
-
+  <!--  tcp joint for grasping-->
+  <link name="tcp_grasping"/>
+  <joint name="tcp_grasping_joint" type="fixed">
+    <parent link="lwr_arm_7_link"/>
+    <child link="tcp_grasping"/>
+    <origin xyz="0.000541 -0.007464 0.205" rpy="0 ${-pi/2} 0"/>
+  </joint>
   <link name="tip"/>
 
   <joint name="tip_joint" type="fixed">
@@ -279,6 +285,7 @@
     <child link="tip"/>
     <origin xyz="0.000091 -0.008086 0.206139" rpy="0 0 ${-pi/2}"/>
   </joint>
+
   <link name="apriltag_table"/>
 
   <joint name="apriltag_table_joint" type="fixed">

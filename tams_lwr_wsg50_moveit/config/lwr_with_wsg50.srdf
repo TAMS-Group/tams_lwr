@@ -17,7 +17,7 @@
         <joint name="lwr_arm_4_joint" />
         <joint name="lwr_arm_5_joint" />
         <joint name="lwr_arm_6_joint" />
-        <chain base_link="lwr_arm_base_link" tip_link="tcp" />
+        <chain base_link="lwr_arm_base_link" tip_link="tcp_grasping" />
     </group>
     <group name="gripper">
         <link name="wsg_50_adapter" />
