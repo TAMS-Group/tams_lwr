@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
         actionlib
         wsg_50_common
         wsg_50_simulation
+        std_srvs
         )
 
 catkin_package(

@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   geometry_msgs
   wsg_50_common
+  std_srvs
 )
 
 find_package(orocos_kdl REQUIRED)
