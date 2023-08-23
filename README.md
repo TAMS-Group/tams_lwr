@@ -16,14 +16,14 @@
 git clone https://github.com/lianghongzhuo/reflexxes_type2.git
 git clone https://github.com/lianghongzhuo/frilibrary.git
 git clone https://github.com/TAMS-Group/tams_apriltags.git
-git clone git@git.crossmodal-learning.org:TAMS/tams_lwr.git
+git clone git@github.com:TAMS-Group/tams_lwr.git
 ```
 
 or use `rosinstall` file:
 ```bash
 cd src
-wget https://raw.githubusercontent.com/TAMS-Group/rosinstalls/master/melodic-tams-lwr.rosinstall
-mv melodic-tams-lwr.rosinstall .rosinstall
+wget https://raw.githubusercontent.com/TAMS-Group/rosinstalls/master/noetic-tams-lwr.rosinstall
+mv noetic-tams-lwr.rosinstall .rosinstall
 wstool update
 ```
 - Build your workspace with
