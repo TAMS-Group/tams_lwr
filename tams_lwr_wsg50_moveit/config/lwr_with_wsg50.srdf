@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--This does not replace URDF, and is not an extension of URDF.
     This is a format for representing semantic information about the robot structure.
     A URDF file must exist for this robot as well, where the joints and the links that are referenced are defined
@@ -20,7 +20,6 @@
         <chain base_link="lwr_arm_base_link" tip_link="tcp_grasping" />
     </group>
     <group name="gripper">
-        <link name="wsg_50_adapter" />
         <link name="wsg_50_gripper_finger_right" />
         <link name="wsg_50_gripper_gripper_right" />
         <link name="wsg_50_gripper_finger_left" />
@@ -79,7 +78,6 @@
     <disable_collisions link1="lwr_adapter2" link2="lwr_arm_5_link" reason="Never" />
     <disable_collisions link1="lwr_adapter2" link2="lwr_arm_6_link" reason="Never" />
     <disable_collisions link1="lwr_adapter2" link2="lwr_arm_7_link" reason="Adjacent" />
-    <disable_collisions link1="lwr_adapter2" link2="wsg_50_adapter" reason="User" />
     <disable_collisions link1="lwr_adapter2" link2="wsg_50_gripper_base_link" reason="Never" />
     <disable_collisions link1="lwr_adapter2" link2="wsg_50_gripper_finger_left" reason="Never" />
     <disable_collisions link1="lwr_adapter2" link2="wsg_50_gripper_finger_right" reason="Never" />
@@ -92,9 +90,9 @@
     <disable_collisions link1="lwr_arm_1_link" link2="lwr_arm_6_link" reason="Never" />
     <disable_collisions link1="lwr_arm_1_link" link2="lwr_arm_7_link" reason="Never" />
     <disable_collisions link1="lwr_arm_1_link" link2="lwr_arm_base_link" reason="Adjacent" />
+    <disable_collisions link1="lwr_arm_1_link" link2="lwr_wsg_50_flange" reason="Never" />
     <disable_collisions link1="lwr_arm_1_link" link2="monitors_and_webcam_obstacle" reason="Never" />
     <disable_collisions link1="lwr_arm_1_link" link2="monitors_and_webcam_obstacle2" reason="Never" />
-    <disable_collisions link1="lwr_arm_1_link" link2="wsg_50_adapter" reason="Never" />
     <disable_collisions link1="lwr_arm_1_link" link2="wsg_50_gripper_base_link" reason="Never" />
     <disable_collisions link1="lwr_arm_1_link" link2="wsg_50_gripper_gripper_left" reason="Never" />
     <disable_collisions link1="lwr_arm_1_link" link2="wsg_50_gripper_gripper_right" reason="Never" />
@@ -104,9 +102,9 @@
     <disable_collisions link1="lwr_arm_2_link" link2="lwr_arm_6_link" reason="Never" />
     <disable_collisions link1="lwr_arm_2_link" link2="lwr_arm_7_link" reason="Never" />
     <disable_collisions link1="lwr_arm_2_link" link2="lwr_arm_base_link" reason="Never" />
+    <disable_collisions link1="lwr_arm_2_link" link2="lwr_wsg_50_flange" reason="Never" />
     <disable_collisions link1="lwr_arm_2_link" link2="monitors_and_webcam_obstacle" reason="Never" />
     <disable_collisions link1="lwr_arm_2_link" link2="monitors_and_webcam_obstacle2" reason="Never" />
-    <disable_collisions link1="lwr_arm_2_link" link2="wsg_50_adapter" reason="Never" />
     <disable_collisions link1="lwr_arm_2_link" link2="wsg_50_gripper_base_link" reason="Never" />
     <disable_collisions link1="lwr_arm_2_link" link2="wsg_50_gripper_finger_left" reason="Never" />
     <disable_collisions link1="lwr_arm_2_link" link2="wsg_50_gripper_finger_right" reason="Never" />
@@ -117,8 +115,8 @@
     <disable_collisions link1="lwr_arm_3_link" link2="lwr_arm_6_link" reason="Never" />
     <disable_collisions link1="lwr_arm_3_link" link2="lwr_arm_7_link" reason="Never" />
     <disable_collisions link1="lwr_arm_3_link" link2="lwr_arm_base_link" reason="Never" />
+    <disable_collisions link1="lwr_arm_3_link" link2="lwr_wsg_50_flange" reason="Never" />
     <disable_collisions link1="lwr_arm_3_link" link2="monitors_and_webcam_obstacle2" reason="Never" />
-    <disable_collisions link1="lwr_arm_3_link" link2="wsg_50_adapter" reason="Never" />
     <disable_collisions link1="lwr_arm_3_link" link2="wsg_50_gripper_base_link" reason="Never" />
     <disable_collisions link1="lwr_arm_3_link" link2="wsg_50_gripper_finger_left" reason="Never" />
     <disable_collisions link1="lwr_arm_3_link" link2="wsg_50_gripper_finger_right" reason="Never" />
@@ -128,7 +126,7 @@
     <disable_collisions link1="lwr_arm_4_link" link2="lwr_arm_6_link" reason="Never" />
     <disable_collisions link1="lwr_arm_4_link" link2="lwr_arm_7_link" reason="Never" />
     <disable_collisions link1="lwr_arm_4_link" link2="lwr_arm_base_link" reason="Never" />
-    <disable_collisions link1="lwr_arm_4_link" link2="wsg_50_adapter" reason="Never" />
+    <disable_collisions link1="lwr_arm_4_link" link2="lwr_wsg_50_flange" reason="Never" />
     <disable_collisions link1="lwr_arm_4_link" link2="wsg_50_gripper_base_link" reason="Never" />
     <disable_collisions link1="lwr_arm_4_link" link2="wsg_50_gripper_finger_left" reason="Never" />
     <disable_collisions link1="lwr_arm_4_link" link2="wsg_50_gripper_finger_right" reason="Never" />
@@ -136,18 +134,20 @@
     <disable_collisions link1="lwr_arm_4_link" link2="wsg_50_gripper_gripper_right" reason="Never" />
     <disable_collisions link1="lwr_arm_5_link" link2="lwr_arm_6_link" reason="Adjacent" />
     <disable_collisions link1="lwr_arm_5_link" link2="lwr_arm_7_link" reason="Never" />
+    <disable_collisions link1="lwr_arm_5_link" link2="wsg_50_gripper_base_link" reason="Never" />
     <disable_collisions link1="lwr_arm_5_link" link2="wsg_50_gripper_finger_left" reason="Never" />
     <disable_collisions link1="lwr_arm_5_link" link2="wsg_50_gripper_finger_right" reason="Never" />
     <disable_collisions link1="lwr_arm_5_link" link2="wsg_50_gripper_gripper_left" reason="Never" />
     <disable_collisions link1="lwr_arm_5_link" link2="wsg_50_gripper_gripper_right" reason="Never" />
     <disable_collisions link1="lwr_arm_6_link" link2="lwr_arm_7_link" reason="Adjacent" />
-    <disable_collisions link1="lwr_arm_6_link" link2="wsg_50_adapter" reason="Never" />
+    <disable_collisions link1="lwr_arm_6_link" link2="lwr_wsg_50_flange" reason="Never" />
     <disable_collisions link1="lwr_arm_6_link" link2="wsg_50_gripper_base_link" reason="Never" />
     <disable_collisions link1="lwr_arm_6_link" link2="wsg_50_gripper_finger_left" reason="Never" />
     <disable_collisions link1="lwr_arm_6_link" link2="wsg_50_gripper_finger_right" reason="Never" />
     <disable_collisions link1="lwr_arm_6_link" link2="wsg_50_gripper_gripper_left" reason="Never" />
     <disable_collisions link1="lwr_arm_6_link" link2="wsg_50_gripper_gripper_right" reason="Never" />
-    <disable_collisions link1="lwr_arm_7_link" link2="wsg_50_adapter" reason="Adjacent" />
+    <disable_collisions link1="lwr_arm_7_link" link2="lwr_arm_base_link" reason="Never" />
+    <disable_collisions link1="lwr_arm_7_link" link2="lwr_wsg_50_flange" reason="Adjacent" />
     <disable_collisions link1="lwr_arm_7_link" link2="wsg_50_gripper_base_link" reason="Never" />
     <disable_collisions link1="lwr_arm_7_link" link2="wsg_50_gripper_finger_left" reason="Never" />
     <disable_collisions link1="lwr_arm_7_link" link2="wsg_50_gripper_finger_right" reason="Never" />
@@ -155,20 +155,20 @@
     <disable_collisions link1="lwr_arm_7_link" link2="wsg_50_gripper_gripper_right" reason="Never" />
     <disable_collisions link1="lwr_arm_base_link" link2="monitors_and_webcam_obstacle" reason="Adjacent" />
     <disable_collisions link1="lwr_arm_base_link" link2="monitors_and_webcam_obstacle2" reason="Adjacent" />
+    <disable_collisions link1="lwr_wsg_50_flange" link2="wsg_50_gripper_base_link" reason="Adjacent" />
+    <disable_collisions link1="lwr_wsg_50_flange" link2="wsg_50_gripper_finger_left" reason="Never" />
+    <disable_collisions link1="lwr_wsg_50_flange" link2="wsg_50_gripper_finger_right" reason="Never" />
+    <disable_collisions link1="lwr_wsg_50_flange" link2="wsg_50_gripper_gripper_left" reason="Never" />
+    <disable_collisions link1="lwr_wsg_50_flange" link2="wsg_50_gripper_gripper_right" reason="Never" />
     <disable_collisions link1="monitors_and_webcam_obstacle" link2="monitors_and_webcam_obstacle2" reason="Adjacent" />
-    <disable_collisions link1="wsg_50_adapter" link2="wsg_50_gripper_base_link" reason="Adjacent" />
-    <disable_collisions link1="wsg_50_adapter" link2="wsg_50_gripper_finger_left" reason="Never" />
-    <disable_collisions link1="wsg_50_adapter" link2="wsg_50_gripper_finger_right" reason="Never" />
-    <disable_collisions link1="wsg_50_adapter" link2="wsg_50_gripper_gripper_left" reason="Never" />
-    <disable_collisions link1="wsg_50_adapter" link2="wsg_50_gripper_gripper_right" reason="Never" />
     <disable_collisions link1="wsg_50_gripper_base_link" link2="wsg_50_gripper_finger_left" reason="Never" />
     <disable_collisions link1="wsg_50_gripper_base_link" link2="wsg_50_gripper_finger_right" reason="Never" />
     <disable_collisions link1="wsg_50_gripper_base_link" link2="wsg_50_gripper_gripper_left" reason="Adjacent" />
     <disable_collisions link1="wsg_50_gripper_base_link" link2="wsg_50_gripper_gripper_right" reason="Adjacent" />
-    <disable_collisions link1="wsg_50_gripper_finger_left" link2="wsg_50_gripper_finger_right" reason="User" />
     <disable_collisions link1="wsg_50_gripper_finger_left" link2="wsg_50_gripper_gripper_left" reason="Adjacent" />
     <disable_collisions link1="wsg_50_gripper_finger_left" link2="wsg_50_gripper_gripper_right" reason="Never" />
     <disable_collisions link1="wsg_50_gripper_finger_right" link2="wsg_50_gripper_gripper_left" reason="Never" />
     <disable_collisions link1="wsg_50_gripper_finger_right" link2="wsg_50_gripper_gripper_right" reason="Adjacent" />
     <disable_collisions link1="wsg_50_gripper_gripper_left" link2="wsg_50_gripper_gripper_right" reason="Never" />
+    <disable_collisions link1="lwr_adapter2" link2="lwr_wsg_50_flange" reason="User" />
 </robot>

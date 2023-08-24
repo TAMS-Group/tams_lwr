@@ -3,6 +3,7 @@
        name="lwr_with_wsg50">
 
   <!-- Kuka LWR with Schunk WSG-50 gripper, experiment table. UHAM room F329 setup.
+       23.03.2023 - new mounting flange
        05.03.2022 - change tcp frame to the original one, use pi for high accuracy transform, clean up
        23.02.2022 - add left obstacle, hide obstacle visual, change obstacle color
        29.06.2016 - catkinize'd version
@@ -15,7 +16,9 @@
   <xacro:include filename="$(find tams_lwr_wsg50_description)/urdf/wsg_50_dsa.xacro"/>
   <xacro:include filename="$(find tams_lwr_description)/urdf/kuka_lwr_arm.xacro"/>
 
-  <!-- this publishes joint_states according to joint transmission's -->
+  <xacro:include filename="$(find tams_lwr_wsg50_description)/urdf/tams_flange.xacro" />
+
+  <!-- this publishes joint_states according to joint transmission's in Gazebo-->
   <!-- note that we have no explicit namespace for the KuKA LWR -->
   <gazebo>
     <plugin name="lwr_gazebo_ros_control" filename="libgazebo_ros_control.so">
@@ -220,46 +223,20 @@
     <child link="lwr_adapter2"/>
   </joint>
 
-  <!-- the adapter plate between KuKA and the WSG gripper, 120x60x5 mm -->
-  <link name="wsg_50_adapter">
-    <inertial>
-      <origin xyz="0 0 0.0025" rpy="0 0 0"/>
-      <mass value="0.05"/>
-      <inertia ixx="1" ixy="0.00" ixz="0.00" iyy="1" iyz="0.00" izz="1"/>
-    </inertial>
-    <visual>
-      <origin xyz="0 0 0.0025" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.12 0.06 0.005"/>
-      </geometry>
-      <material name="LightGrey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0.0025" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.12 0.06 0.005"/>
-      </geometry>
-    </collision>
-  </link>
-  <gazebo reference="wsg_50_adapter">
-    <material>Gazebo/WhiteGlow</material>
-    <turnGravityOff>false</turnGravityOff>
-    <selfCollide>false</selfCollide>
-    <!-- kp: stiffness kd: damping mu1, mu2: friction -->
-    <mu1>100.0</mu1>
-    <mu2>100.0</mu2>
-    <kp>1000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  <joint name="lwr_adapter" type="fixed">  <!-- wrist to Shadow adapter plate -->
-    <origin rpy="0 0 ${-pi/2}" xyz="0 0 0.01"/> <!-- 1 cm z offset due to thickness of kuka_adapter2 plate -->
+  <xacro:tams_flange name="lwr_wsg_50_flange" diameter="0.097" length="0.016" />
+
+  <joint name="lwr_wsg_flange_joint" type="fixed">
+    <origin rpy="0 0 -1.57" xyz="0 0 0.01"/>
     <parent link="lwr_arm_7_link"/>
-    <child link="wsg_50_adapter"/>
+    <child link="lwr_wsg_50_flange"/>
   </joint>
 
-  <!-- wsg_50 gripper with DSA tactile fingers -->
-  <xacro:wsg_50_dsa parent="wsg_50_adapter" name="wsg_50_gripper">
-    <origin xyz="0.008086 0.000091 0.005" rpy="0 0 0"/>
+  <!-- wsg_50 gripper with DSA tactile fingers, mounted on lwr_wsg_50_flange plate,
+       which has 12mm thickness for the "core" part plus 6mm for the gripper mount plate. 
+       TODO: check yaw orientation (0 deg or 180 deg).
+  -->
+  <xacro:wsg_50_dsa  parent="lwr_wsg_50_flange" name="wsg_50_gripper" >
+    <origin xyz="0.008086 0.000091 ${0.012+0.006}" rpy="0 0 0" />
   </xacro:wsg_50_dsa>
 
   <!-- TCP tool-center-point, center of the WSG-50 fingers -->
@@ -269,15 +246,18 @@
     <parent link="lwr_arm_7_link"/>
     <child link="tcp"/>
     <!-- <origin xyz="0.000091 -0.008086 0.15" rpy="0 0 ${-pi/2}" /> -->
-    <origin xyz="0.000541 -0.007464 0.205" rpy="0 0 ${-pi/2}"/>
+    <origin xyz="0.000541 -0.007464 ${0.205+0.0011}" rpy="0 0 ${-pi/2}"/>
   </joint>
+
   <!--  tcp joint for grasping-->
   <link name="tcp_grasping"/>
+
   <joint name="tcp_grasping_joint" type="fixed">
     <parent link="lwr_arm_7_link"/>
     <child link="tcp_grasping"/>
     <origin xyz="0.000541 -0.007464 0.205" rpy="0 ${-pi/2} 0"/>
   </joint>
+
   <link name="tip"/>
 
   <joint name="tip_joint" type="fixed">

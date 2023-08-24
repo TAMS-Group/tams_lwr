@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="tams_flange">
+  
+  <!-- placeholder macro for the core/outer tams_flange adapters.
+       Modelled as a cylinder with given diameter and length,
+       with the origin at the bottom (0,0,0) and rising along +z.
+       Currently, most tams_core adapters are d=0.08 and h=0.012,
+       while the outer adapters have d=0.097 and different height
+       according to the function.
+  -->
+
+  <xacro:property name="transparency" value="1.0" />
+
+
+  <xacro:macro name="tams_flange" params="name diameter length" >
+
+    <link name="${name}">
+      <inertial>
+        <origin xyz="0 0 ${length/2}" />
+        <mass value="0.05" />
+        <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 ${length/2}" />
+          <material name="${name}/base_material" >
+          <color rgba="0.2 0.2 0.2 ${transparency}" />
+        </material>
+        <geometry>
+          <cylinder radius="${diameter/2}" length="${length}" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 ${length/2}" />
+          <material name="${name}/base_material" >
+          <color rgba="0.2 0.2 0.2 ${transparency}" />
+        </material> 
+        <geometry>
+          <cylinder radius="${diameter/2}" length="${length}" />
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- no gazebo block needed, unless you want colors -->
+
+  </xacro:macro>
+
+</robot>
