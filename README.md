@@ -1,7 +1,7 @@
 # TAMS KUKA LWR
 
-| ![kuka](doc/kuka_fig.jpg) | ![kuka](doc/kuka_perception.png) |
-|---------------------------|----------------------------------|
+|![kuka](doc/kuka_fig.jpg) | ![kuka](doc/kuka_perception.png) |
+|:-------------------------:|:--------------------------------:|
 | Kuka LWR                  | Perception                       |
 
 ## Introduction
